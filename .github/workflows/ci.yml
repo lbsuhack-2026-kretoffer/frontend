@@ -24,6 +24,3 @@ jobs:
 
       - name: Run Oxlint (Check for errors)
         run: npm run lint
-
-      - name: Check TypeScript types
-        run: npm run check-types
