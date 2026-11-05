@@ -92,6 +92,15 @@
   .print-only {
     display: none;
   }
+
+  /* Срезанные углы для строгой геометрической пластики */
+  .facet-corner {
+    clip-path: polygon(20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%, 0 20%);
+  }
+
+  .facet-corner-sm {
+    clip-path: polygon(16% 0, 100% 0, 100% 84%, 84% 100%, 0 100%, 0 16%);
+  }
 }
 
 @keyframes overlay-in {

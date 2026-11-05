@@ -32,7 +32,7 @@ import { ROLE_LABELS } from '@/shared/lib/labels'
 function Logo({ compact = false }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-black shadow-sm">
+      <div className="facet-corner flex h-9 w-9 shrink-0 items-center justify-center bg-brand-500 text-black">
         <GraduationCap className="h-5 w-5" />
       </div>
       {!compact ? (
