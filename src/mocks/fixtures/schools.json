@@ -1,0 +1,50 @@
+[
+  {
+    "id": "school-a",
+    "name": "Гимназия №12",
+    "city": "Минск",
+    "address": "ул. Кропоткина, 12",
+    "phone": "+375 17 123-45-67",
+    "email": "gym12@edu.by",
+    "mealPlan": "fixed",
+    "timezone": "Europe/Minsk",
+    "bufferPercent": 10,
+    "attendanceDeadline": "09:30",
+    "accessEnabled": true,
+    "createdAt": "2025-08-15",
+    "integrations": {
+      "pos": false,
+      "skud": true
+    },
+    "classesCount": 3,
+    "studentsCount": 75,
+    "teachersCount": 3,
+    "adminIds": [
+      "u-school-a"
+    ]
+  },
+  {
+    "id": "school-b",
+    "name": "Средняя школа №34",
+    "city": "Минск",
+    "address": "пр-т Независимости, 34",
+    "phone": "+375 17 765-43-21",
+    "email": "sch34@edu.by",
+    "mealPlan": "canteen",
+    "timezone": "Europe/Minsk",
+    "bufferPercent": 8,
+    "attendanceDeadline": "09:15",
+    "accessEnabled": true,
+    "createdAt": "2025-09-01",
+    "integrations": {
+      "pos": true,
+      "skud": false
+    },
+    "classesCount": 2,
+    "studentsCount": 50,
+    "teachersCount": 2,
+    "adminIds": [
+      "u-school-b"
+    ]
+  }
+]

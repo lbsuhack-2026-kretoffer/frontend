@@ -24,3 +24,9 @@ jobs:
 
       - name: Run Oxlint (Check for errors)
         run: npm run lint
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build production bundle
+        run: npm run build

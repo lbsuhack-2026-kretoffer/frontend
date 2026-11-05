@@ -1,0 +1,92 @@
+[
+  {
+    "id": "u-platform",
+    "fullName": "Ирина Соколова",
+    "email": "admin@balancepit.by",
+    "role": "platform_admin",
+    "schoolId": null,
+    "position": "Администратор платформы",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-school-a",
+    "fullName": "Наталья Ковалёва",
+    "email": "kovaleva@gym12.by",
+    "role": "school_admin",
+    "schoolId": "school-a",
+    "position": "Завуч по учебной работе",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-school-b",
+    "fullName": "Дмитрий Лебедев",
+    "email": "lebedev@sch34.by",
+    "role": "school_admin",
+    "schoolId": "school-b",
+    "position": "Заместитель директора",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-teach-a-1",
+    "fullName": "Марина Соловьёва",
+    "email": "soloveva@gym12.by",
+    "role": "teacher",
+    "schoolId": "school-a",
+    "position": "Учитель начальных классов",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-teach-a-2",
+    "fullName": "Алексей Морозов",
+    "email": "morozov@gym12.by",
+    "role": "teacher",
+    "schoolId": "school-a",
+    "position": "Учитель истории",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-teach-a-3",
+    "fullName": "Елена Захарова",
+    "email": "zaharova@gym12.by",
+    "role": "teacher",
+    "schoolId": "school-a",
+    "position": "Учитель математики",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-teach-b-1",
+    "fullName": "Ольга Никитина",
+    "email": "nikitina@sch34.by",
+    "role": "teacher",
+    "schoolId": "school-b",
+    "position": "Учитель русского языка",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-teach-b-2",
+    "fullName": "Павел Орлов",
+    "email": "orlov@sch34.by",
+    "role": "teacher",
+    "schoolId": "school-b",
+    "position": "Учитель физики",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-canteen-b",
+    "fullName": "Татьяна Мельник",
+    "email": "melnik@kshp.by",
+    "role": "canteen",
+    "schoolId": "school-b",
+    "position": "Оператор КШП",
+    "avatarUrl": null
+  },
+  {
+    "id": "u-guard-a",
+    "fullName": "Сергей Громов",
+    "email": "gromov@gym12.by",
+    "role": "guard",
+    "schoolId": "school-a",
+    "position": "Сотрудник охраны",
+    "avatarUrl": null
+  }
+]

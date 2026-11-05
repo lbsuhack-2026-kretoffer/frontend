@@ -1,0 +1,450 @@
+[
+  {
+    "schoolId": "school-b",
+    "dayOffset": -13,
+    "categoryId": "cat-hot",
+    "qty": 15,
+    "revenue": 63,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -13,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -13,
+    "categoryId": "cat-bakery",
+    "qty": 9,
+    "revenue": 19.8,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -13,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -12,
+    "categoryId": "cat-hot",
+    "qty": 17,
+    "revenue": 71.4,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -12,
+    "categoryId": "cat-salad",
+    "qty": 8,
+    "revenue": 24.8,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -12,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -12,
+    "categoryId": "cat-drinks",
+    "qty": 5,
+    "revenue": 9,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -11,
+    "categoryId": "cat-hot",
+    "qty": 17,
+    "revenue": 71.4,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -11,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -11,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -11,
+    "categoryId": "cat-drinks",
+    "qty": 5,
+    "revenue": 9,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -10,
+    "categoryId": "cat-hot",
+    "qty": 16,
+    "revenue": 67.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -10,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -10,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -10,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -9,
+    "categoryId": "cat-hot",
+    "qty": 16,
+    "revenue": 67.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -9,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -9,
+    "categoryId": "cat-bakery",
+    "qty": 12,
+    "revenue": 26.4,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -9,
+    "categoryId": "cat-drinks",
+    "qty": 5,
+    "revenue": 9,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -8,
+    "categoryId": "cat-hot",
+    "qty": 15,
+    "revenue": 63,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -8,
+    "categoryId": "cat-salad",
+    "qty": 6,
+    "revenue": 18.6,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -8,
+    "categoryId": "cat-bakery",
+    "qty": 10,
+    "revenue": 22,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -8,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -7,
+    "categoryId": "cat-hot",
+    "qty": 16,
+    "revenue": 67.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -7,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -7,
+    "categoryId": "cat-bakery",
+    "qty": 10,
+    "revenue": 22,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -7,
+    "categoryId": "cat-drinks",
+    "qty": 5,
+    "revenue": 9,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -6,
+    "categoryId": "cat-hot",
+    "qty": 15,
+    "revenue": 63,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -6,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -6,
+    "categoryId": "cat-bakery",
+    "qty": 10,
+    "revenue": 22,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -6,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -5,
+    "categoryId": "cat-hot",
+    "qty": 15,
+    "revenue": 63,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -5,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -5,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -5,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -4,
+    "categoryId": "cat-hot",
+    "qty": 16,
+    "revenue": 67.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -4,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -4,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -4,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -3,
+    "categoryId": "cat-hot",
+    "qty": 16,
+    "revenue": 67.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -3,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -3,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -3,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -2,
+    "categoryId": "cat-hot",
+    "qty": 17,
+    "revenue": 71.4,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -2,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -2,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -2,
+    "categoryId": "cat-drinks",
+    "qty": 5,
+    "revenue": 9,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -1,
+    "categoryId": "cat-hot",
+    "qty": 15,
+    "revenue": 63,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -1,
+    "categoryId": "cat-salad",
+    "qty": 6,
+    "revenue": 18.6,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -1,
+    "categoryId": "cat-bakery",
+    "qty": 11,
+    "revenue": 24.2,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": -1,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": 0,
+    "categoryId": "cat-hot",
+    "qty": 17,
+    "revenue": 71.4,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": 0,
+    "categoryId": "cat-salad",
+    "qty": 7,
+    "revenue": 21.7,
+    "wasteQty": 0
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": 0,
+    "categoryId": "cat-bakery",
+    "qty": 10,
+    "revenue": 22,
+    "wasteQty": 1
+  },
+  {
+    "schoolId": "school-b",
+    "dayOffset": 0,
+    "categoryId": "cat-drinks",
+    "qty": 4,
+    "revenue": 7.2,
+    "wasteQty": 0
+  }
+]

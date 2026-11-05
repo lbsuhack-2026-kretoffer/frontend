@@ -1,0 +1,1127 @@
+[
+  {
+    "id": "s-a-2a-01",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Петрова Мария Артёмовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-01"
+  },
+  {
+    "id": "s-a-2a-02",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Степанова Алина Денисовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-02"
+  },
+  {
+    "id": "s-a-2a-03",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Никитина Полина Максимовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-03"
+  },
+  {
+    "id": "s-a-2a-04",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Романов Роман Тимофеевич",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-04"
+  },
+  {
+    "id": "s-a-2a-05",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Петрова Татьяна Никитична",
+    "mealStatus": "optOut",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-05"
+  },
+  {
+    "id": "s-a-2a-06",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Павлова Василиса Сергеевна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-06"
+  },
+  {
+    "id": "s-a-2a-07",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Андреева Светлана Артёмовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-07"
+  },
+  {
+    "id": "s-a-2a-08",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Григорьева Ева Денисовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-08"
+  },
+  {
+    "id": "s-a-2a-09",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Фролов Денис Никитич",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-09"
+  },
+  {
+    "id": "s-a-2a-10",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Волков Иван Олегович",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-10"
+  },
+  {
+    "id": "s-a-2a-11",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Николаев Павел Ильич",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-11"
+  },
+  {
+    "id": "s-a-2a-12",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Григорьева Алиса Викторовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-12"
+  },
+  {
+    "id": "s-a-2a-13",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Сергеев Кирилл Егорович",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-13"
+  },
+  {
+    "id": "s-a-2a-14",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Морозов Денис Викторович",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-14"
+  },
+  {
+    "id": "s-a-2a-15",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Николаева Ксения Романовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-15"
+  },
+  {
+    "id": "s-a-2a-16",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Соловьёва Светлана Ивановна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-16"
+  },
+  {
+    "id": "s-a-2a-17",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Романов Максим Матвеевич",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-17"
+  },
+  {
+    "id": "s-a-2a-18",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Морозова Юлия Антоновна",
+    "mealStatus": "optOut",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-18"
+  },
+  {
+    "id": "s-a-2a-19",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Егоров Максим Кириллович",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-19"
+  },
+  {
+    "id": "s-a-2a-20",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Соловьёва Юлия Олеговна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-20"
+  },
+  {
+    "id": "s-a-2a-21",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Яковлева Мария Матвеевна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-21"
+  },
+  {
+    "id": "s-a-2a-22",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Дмитриева Екатерина Никитична",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-22"
+  },
+  {
+    "id": "s-a-2a-23",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Новиков Лев Кириллович",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-23"
+  },
+  {
+    "id": "s-a-2a-24",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Захарова Полина Викторовна",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-24"
+  },
+  {
+    "id": "s-a-2a-25",
+    "schoolId": "school-a",
+    "classId": "class-a-2a",
+    "fullName": "Романов Глеб Владимирович",
+    "mealStatus": "regular",
+    "ageGroup": "junior",
+    "cardNumber": "A-2А-25"
+  },
+  {
+    "id": "s-a-6a-01",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Соколов Артём Иванович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-01"
+  },
+  {
+    "id": "s-a-6a-02",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Петрова Юлия Владимировна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-02"
+  },
+  {
+    "id": "s-a-6a-03",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Макаров Антон Максимович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-03"
+  },
+  {
+    "id": "s-a-6a-04",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Захарова Дарья Денисовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-04"
+  },
+  {
+    "id": "s-a-6a-05",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Александрова Любовь Михайловна",
+    "mealStatus": "optOut",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-05"
+  },
+  {
+    "id": "s-a-6a-06",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Морозова Ксения Владимировна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-06"
+  },
+  {
+    "id": "s-a-6a-07",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Степанов Денис Андреевич",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-07"
+  },
+  {
+    "id": "s-a-6a-08",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Никитин Егор Олегович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-08"
+  },
+  {
+    "id": "s-a-6a-09",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Романов Денис Даниилович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-09"
+  },
+  {
+    "id": "s-a-6a-10",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Дмитриев Александр Львович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-10"
+  },
+  {
+    "id": "s-a-6a-11",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Лебедев Роман Никитич",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-11"
+  },
+  {
+    "id": "s-a-6a-12",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Зайцева Диана Евгеньевна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-12"
+  },
+  {
+    "id": "s-a-6a-13",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Григорьев Тимофей Михайлович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-13"
+  },
+  {
+    "id": "s-a-6a-14",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Соколов Денис Денисович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-14"
+  },
+  {
+    "id": "s-a-6a-15",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Егорова Екатерина Кирилловна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-15"
+  },
+  {
+    "id": "s-a-6a-16",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Андреев Лев Максимович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-16"
+  },
+  {
+    "id": "s-a-6a-17",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Борисова Дарья Романовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-17"
+  },
+  {
+    "id": "s-a-6a-18",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Александрова Светлана Артёмовна",
+    "mealStatus": "optOut",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-18"
+  },
+  {
+    "id": "s-a-6a-19",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Ковалёв Дмитрий Ильич",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-19"
+  },
+  {
+    "id": "s-a-6a-20",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Козлова Юлия Александровна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-20"
+  },
+  {
+    "id": "s-a-6a-21",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Борисова Кристина Матвеевна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-21"
+  },
+  {
+    "id": "s-a-6a-22",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Воробьёва Екатерина Никитична",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-22"
+  },
+  {
+    "id": "s-a-6a-23",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Морозова Диана Кирилловна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-23"
+  },
+  {
+    "id": "s-a-6a-24",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Степанова Екатерина Александровна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-24"
+  },
+  {
+    "id": "s-a-6a-25",
+    "schoolId": "school-a",
+    "classId": "class-a-6a",
+    "fullName": "Никитин Лев Павлович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "A-6А-25"
+  },
+  {
+    "id": "s-a-10a-01",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Кузьмина Варвара Максимовна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-01"
+  },
+  {
+    "id": "s-a-10a-02",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Дмитриева Юлия Глебовна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-02"
+  },
+  {
+    "id": "s-a-10a-03",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Козлов Виктор Михайлович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-03"
+  },
+  {
+    "id": "s-a-10a-04",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Николаев Сергей Глебович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-04"
+  },
+  {
+    "id": "s-a-10a-05",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Романов Александр Егорович",
+    "mealStatus": "optOut",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-05"
+  },
+  {
+    "id": "s-a-10a-06",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Фролов Матвей Антонович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-06"
+  },
+  {
+    "id": "s-a-10a-07",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Егорова Светлана Дмитриевна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-07"
+  },
+  {
+    "id": "s-a-10a-08",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Степанов Артём Владимирович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-08"
+  },
+  {
+    "id": "s-a-10a-09",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Соловьёва Вера Данииловна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-09"
+  },
+  {
+    "id": "s-a-10a-10",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Фролова Мария Денисовна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-10"
+  },
+  {
+    "id": "s-a-10a-11",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Волков Сергей Матвеевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-11"
+  },
+  {
+    "id": "s-a-10a-12",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Степанов Евгений Львович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-12"
+  },
+  {
+    "id": "s-a-10a-13",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Зайцев Матвей Ильич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-13"
+  },
+  {
+    "id": "s-a-10a-14",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Воробьёва Диана Олеговна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-14"
+  },
+  {
+    "id": "s-a-10a-15",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Королёв Кирилл Тимофеевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-15"
+  },
+  {
+    "id": "s-a-10a-16",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Степанова Надежда Олеговна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-16"
+  },
+  {
+    "id": "s-a-10a-17",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Макаров Дмитрий Ильич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-17"
+  },
+  {
+    "id": "s-a-10a-18",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Григорьева Юлия Олеговна",
+    "mealStatus": "optOut",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-18"
+  },
+  {
+    "id": "s-a-10a-19",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Дмитриев Артём Андреевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-19"
+  },
+  {
+    "id": "s-a-10a-20",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Егорова Василиса Артёмовна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-20"
+  },
+  {
+    "id": "s-a-10a-21",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Степанов Максим Владимирович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-21"
+  },
+  {
+    "id": "s-a-10a-22",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Борисова Екатерина Ивановна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-22"
+  },
+  {
+    "id": "s-a-10a-23",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Сергеев Глеб Матвеевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-23"
+  },
+  {
+    "id": "s-a-10a-24",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Волков Артём Дмитриевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-24"
+  },
+  {
+    "id": "s-a-10a-25",
+    "schoolId": "school-a",
+    "classId": "class-a-10a",
+    "fullName": "Орлов Глеб Павлович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "A-10А-25"
+  },
+  {
+    "id": "s-b-5b-01",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Захарова София Максимовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-01"
+  },
+  {
+    "id": "s-b-5b-02",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Сергеева Ольга Денисовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-02"
+  },
+  {
+    "id": "s-b-5b-03",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Волков Максим Михайлович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-03"
+  },
+  {
+    "id": "s-b-5b-04",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Павлова Дарья Глебовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-04"
+  },
+  {
+    "id": "s-b-5b-05",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Андреев Антон Даниилович",
+    "mealStatus": "optOut",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-05"
+  },
+  {
+    "id": "s-b-5b-06",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Кузьмина Ева Глебовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-06"
+  },
+  {
+    "id": "s-b-5b-07",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Ковалёв Олег Ильич",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-07"
+  },
+  {
+    "id": "s-b-5b-08",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Павлова Дарья Львовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-08"
+  },
+  {
+    "id": "s-b-5b-09",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Макаров Лев Егорович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-09"
+  },
+  {
+    "id": "s-b-5b-10",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Соловьёв Михаил Глебович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-10"
+  },
+  {
+    "id": "s-b-5b-11",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Королёв Павел Даниилович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-11"
+  },
+  {
+    "id": "s-b-5b-12",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Морозов Артём Олегович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-12"
+  },
+  {
+    "id": "s-b-5b-13",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Степанов Тимофей Михайлович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-13"
+  },
+  {
+    "id": "s-b-5b-14",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Зайцева Любовь Антоновна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-14"
+  },
+  {
+    "id": "s-b-5b-15",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Александрова Екатерина Кирилловна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-15"
+  },
+  {
+    "id": "s-b-5b-16",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Морозов Лев Александрович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-16"
+  },
+  {
+    "id": "s-b-5b-17",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Егорова Алиса Кирилловна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-17"
+  },
+  {
+    "id": "s-b-5b-18",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Макаров Матвей Евгеньевич",
+    "mealStatus": "optOut",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-18"
+  },
+  {
+    "id": "s-b-5b-19",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Кузьмина Полина Владимировна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-19"
+  },
+  {
+    "id": "s-b-5b-20",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Соколова Екатерина Ивановна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-20"
+  },
+  {
+    "id": "s-b-5b-21",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Павлова Диана Романовна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-21"
+  },
+  {
+    "id": "s-b-5b-22",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Орлов Кирилл Александрович",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-22"
+  },
+  {
+    "id": "s-b-5b-23",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Воробьёва Вера Владимировна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-23"
+  },
+  {
+    "id": "s-b-5b-24",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Королёв Даниил Никитич",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-24"
+  },
+  {
+    "id": "s-b-5b-25",
+    "schoolId": "school-b",
+    "classId": "class-b-5b",
+    "fullName": "Новикова Надежда Тимофеевна",
+    "mealStatus": "regular",
+    "ageGroup": "middle",
+    "cardNumber": "B-5Б-25"
+  },
+  {
+    "id": "s-b-11a-01",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Макарова Ева Дмитриевна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-01"
+  },
+  {
+    "id": "s-b-11a-02",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Романова Ольга Тимофеевна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-02"
+  },
+  {
+    "id": "s-b-11a-03",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Фролов Александр Никитич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-03"
+  },
+  {
+    "id": "s-b-11a-04",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Морозова Екатерина Сергеевна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-04"
+  },
+  {
+    "id": "s-b-11a-05",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Степанова Надежда Данииловна",
+    "mealStatus": "optOut",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-05"
+  },
+  {
+    "id": "s-b-11a-06",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Борисова Арина Сергеевна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-06"
+  },
+  {
+    "id": "s-b-11a-07",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Воробьёв Антон Никитич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-07"
+  },
+  {
+    "id": "s-b-11a-08",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Королёв Михаил Павлович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-08"
+  },
+  {
+    "id": "s-b-11a-09",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Егорова Ирина Никитична",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-09"
+  },
+  {
+    "id": "s-b-11a-10",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Никитин Дмитрий Львович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-10"
+  },
+  {
+    "id": "s-b-11a-11",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Кузьмин Матвей Андреевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-11"
+  },
+  {
+    "id": "s-b-11a-12",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Королёва Кристина Глебовна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-12"
+  },
+  {
+    "id": "s-b-11a-13",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Лебедева Юлия Михайловна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-13"
+  },
+  {
+    "id": "s-b-11a-14",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Андреева Надежда Антоновна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-14"
+  },
+  {
+    "id": "s-b-11a-15",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Романова Ксения Егоровна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-15"
+  },
+  {
+    "id": "s-b-11a-16",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Дмитриева Татьяна Викторовна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-16"
+  },
+  {
+    "id": "s-b-11a-17",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Морозов Артём Тимофеевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-17"
+  },
+  {
+    "id": "s-b-11a-18",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Андреев Павел Олегович",
+    "mealStatus": "optOut",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-18"
+  },
+  {
+    "id": "s-b-11a-19",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Борисов Никита Тимофеевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-19"
+  },
+  {
+    "id": "s-b-11a-20",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Фролов Илья Антонович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-20"
+  },
+  {
+    "id": "s-b-11a-21",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Лебедева Анна Павловна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-21"
+  },
+  {
+    "id": "s-b-11a-22",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Степанов Даниил Максимович",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-22"
+  },
+  {
+    "id": "s-b-11a-23",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Зайцев Глеб Сергеевич",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-23"
+  },
+  {
+    "id": "s-b-11a-24",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Григорьева Алиса Ивановна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-24"
+  },
+  {
+    "id": "s-b-11a-25",
+    "schoolId": "school-b",
+    "classId": "class-b-11a",
+    "fullName": "Королёва Надежда Глебовна",
+    "mealStatus": "regular",
+    "ageGroup": "senior",
+    "cardNumber": "B-11А-25"
+  }
+]

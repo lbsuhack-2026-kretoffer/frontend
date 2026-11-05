@@ -1,111 +1,194 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import '@fontsource-variable/inter';
+@import 'tailwindcss';
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Чёрно-жёлтая тема */
+  --color-app: #070707;
+  --color-surface: #121212;
+  --color-elevated: #1c1c1c;
+  --color-line: #2b2b2b;
+  --color-line-strong: #404040;
+  --color-strong: #fafafa;
+  --color-body: #e5e5e5;
+  --color-muted: #a3a3a3;
+  --color-subtle: #8a8a8a;
+  --color-faint: #525252;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --color-brand-50: #221c03;
+  --color-brand-100: #3a2f05;
+  --color-brand-200: #5f4c06;
+  --color-brand-300: #8a6d08;
+  --color-brand-400: #fde047;
+  --color-brand-500: #facc15;
+  --color-brand-600: #eab308;
+  --color-brand-700: #facc15;
+  --color-brand-800: #fbbf24;
+  --color-brand-900: #a16207;
+  --color-brand-950: #422006;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-app text-body antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  ::selection {
+    background: var(--color-brand-500);
+    color: #000;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-strong);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+    caret-color: var(--color-strong);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-app);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border: 2px solid var(--color-app);
+    border-radius: 9999px;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
   }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .print-only {
+    display: none;
   }
 }
 
-body {
-  margin: 0;
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+@keyframes content-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(16px); }
+}
+
+[data-slot='dialog-overlay'][data-state='open'] {
+  animation: overlay-in 160ms ease-out;
+}
+
+[data-slot='dialog-content'][data-state='open'] {
+  animation: content-in 180ms ease-out;
+}
+
+[data-slot='toast'][data-state='open'] {
+  animation: toast-in 180ms ease-out;
+}
+
+[data-slot='toast'][data-state='closed'] {
+  animation: toast-out 150ms ease-in forwards;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
   }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+  .print-only {
+    display: block !important;
   }
-}
-p {
-  margin: 0;
-}
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
+  html {
+    color-scheme: light;
+  }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .print-area {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-area * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .print-area .recharts-text {
+    fill: #000 !important;
+  }
+
+  .print-area .recharts-cartesian-grid line {
+    stroke: #d4d4d4 !important;
+  }
+
+  .print-area .recharts-area-curve,
+  .print-area .recharts-line-curve {
+    stroke: #000 !important;
+  }
+
+  .print-area .recharts-area-area {
+    fill: rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .print-area .recharts-bar-rectangle path,
+  .print-area .recharts-bar-rectangle rect {
+    fill: #404040 !important;
+  }
+
+  .print-break-avoid {
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 14mm;
+  }
 }
