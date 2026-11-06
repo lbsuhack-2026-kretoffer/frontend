@@ -17,4 +17,4 @@ services:
 
 networks:
   hakaton-net:
-    name: hakaton-net
+    external: true
