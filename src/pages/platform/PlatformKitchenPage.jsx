@@ -181,7 +181,6 @@ export default function PlatformKitchenPage() {
   const [kitchenSchools, setKitchenSchools] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [createUserOpen, setCreateUserOpen] = useState(false)
   const [attachOpen, setAttachOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
@@ -232,6 +231,11 @@ export default function PlatformKitchenPage() {
     }
   }
 
+  const selectKitchen = async (kitchen) => {
+    setSelectedKitchen(kitchen)
+    await loadMenu(kitchen.id)
+  }
+
   return (
     <>
       <PageHeader
@@ -269,39 +273,25 @@ export default function PlatformKitchenPage() {
                   }
                 />
               ) : (
-                <Table>
-                  <THead>
-                    <TR>
-                      <TH>Название</TH>
-                      <TH>Район</TH>
-                      <TH>Школ</TH>
-                      <TH className="text-right">Действия</TH>
-                    </TR>
-                  </THead>
-                  <TBody>
-                    {kitchens.map((kitchen) => (
-                      <TR key={kitchen.id}>
-                        <TD className="font-medium text-strong">{kitchen.name}</TD>
-                        <TD>{kitchen.district}</TD>
-                        <TD>{kitchenSchools.filter((s) => s.kitchenId === kitchen.id).length}</TD>
-                        <TD>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setSelectedKitchen(kitchen)
-                              setMenuOpen(true)
-                              loadMenu(kitchen.id)
-                            }}
-                          >
-                            <Utensils className="h-3.5 w-3.5" />
-                            Меню
-                          </Button>
-                        </TD>
-                      </TR>
-                    ))}
-                  </TBody>
-                </Table>
+                <div className="space-y-2">
+                  {kitchens.map((kitchen) => (
+                    <div key={kitchen.id} className="flex items-center justify-between p-3 rounded-lg border border-line hover:bg-elevated cursor-pointer transition-colors group" onClick={() => selectKitchen(kitchen)}>
+                      <div>
+                        <div className="font-medium text-strong">{kitchen.name}</div>
+                        <div className="text-[11px] text-muted">{kitchen.district}</div>
+                        <div className="text-[10px] text-muted">{kitchenSchools.filter((s) => s.kitchenId === kitchen.id).length} школа(й)</div>
+                      </div>
+                      <Button size="sm" variant="outline" onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedKitchen(kitchen)
+                        loadMenu(kitchen.id)
+                      }}>
+                        <Utensils className="h-3.5 w-3.5 mr-1" />
+                        Меню
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
