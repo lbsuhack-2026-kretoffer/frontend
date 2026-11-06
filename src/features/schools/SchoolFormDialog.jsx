@@ -44,6 +44,7 @@ const createSchema = baseSchema.extend({
 const defaultCreate = {
   name: '',
   city: 'Минск',
+  district: '',
   address: '',
   phone: '',
   email: '',
