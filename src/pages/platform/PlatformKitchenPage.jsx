@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Plus, Utensils, Menu, UserPlus, Link, Unlink } from 'lucide-react'
+import { Factory, Plus, Utensils, Menu, Link, Unlink } from 'lucide-react'
 import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
@@ -320,13 +320,7 @@ export default function PlatformKitchenPage() {
               {/* Школы КШП */}
               <Card className="overflow-hidden">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
-                    <Button onClick={() => setAttachOpen(true)}>
-                      <Link className="h-3.5 w-3.5" />
-                      Привязать школу
-                    </Button>
-                  </div>
+                  <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-2">
                   {kitchenSchools.length === 0 ? (
@@ -384,10 +378,6 @@ export default function PlatformKitchenPage() {
                       <Plus className="h-3.5 w-3.5" />
                       Добавить блюдо
                     </Button>
-                    <Button onClick={() => setCreateUserOpen(true)}>
-                      <UserPlus className="h-3.5 w-3.5" />
-                      Пользователь КШП
-                    </Button>
                     <Button variant="outline" onClick={() => setMenuOpen(false)}>
                       Закрыть
                     </Button>
@@ -423,11 +413,6 @@ export default function PlatformKitchenPage() {
 
       <CreateKitchenDialog open={createOpen} onOpenChange={setCreateOpen} />
       <MenuItemDialog open={menuOpen} onOpenChange={setMenuOpen} kitchenId={selectedKitchen?.id} />
-      <CreateKitchenUserDialog
-        open={createUserOpen}
-        onOpenChange={setCreateUserOpen}
-        kitchenId={selectedKitchen?.id}
-      />
       <AttachSchoolDialog
         open={attachOpen}
         onOpenChange={setAttachOpen}

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Utensils, Plus, Menu, UserPlus, Link, Unlink } from 'lucide-react'
-import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
+import { Factory, Utensils, Plus, Menu, Link, Unlink } from 'lucide-react'
+import { useCreateKitchen, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Dialog } from '@/shared/ui/dialog'
 import { EmptyState } from '@/shared/ui/empty-state'
-import { Field, Input, Select } from '@/shared/ui/input'
+import { Field, Input } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
 import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
 import { useToast } from '@/shared/ui/use-toast'
@@ -17,14 +17,12 @@ export default function KitchenPage() {
   const [menuItems, setMenuItems] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [createKitchenOpen, setCreateKitchenOpen] = useState(false)
-  const [createUserOpen, setCreateUserOpen] = useState(false)
   const [attachOpen, setAttachOpen] = useState(false)
   const [loadingKitchens, setLoadingKitchens] = useState(false)
   const [loadingMenu, setLoadingMenu] = useState(false)
 
   const createMenuItem = useCreateMenuItem()
   const createKitchen = useCreateKitchen()
-  const createKitchenUser = useCreateKitchenUser()
   const setSchoolKitchen = useSetSchoolKitchen()
 
   const loadKitchens = useCallback(async () => {
@@ -72,12 +70,6 @@ export default function KitchenPage() {
     }
   }, [kitchens, selectedKitchenId])
 
-  useEffect(() => {
-    if (schoolsData) {
-      // schoolsData уже приходит отфильтрованным по kitchenId бэкендом
-    }
-  }, [schoolsData])
-
   const selectedKitchen = kitchens.find((k) => k.id === selectedKitchenId)
 
   const submitMenuItem = async (event) => {
@@ -111,9 +103,6 @@ export default function KitchenPage() {
     const form = new FormData(event.target)
     const name = form.get('name')
     const district = form.get('district')
-    const email = form.get('email')
-    const fullName = form.get('fullName')
-    const password = form.get('password')
 
     if (!name || !district) {
       toast({ title: 'Заполните все поля', variant: 'error' })
@@ -121,50 +110,13 @@ export default function KitchenPage() {
     }
 
     try {
-      await createKitchen.mutateAsync({
-        name: String(name),
-        district: String(district),
-        email: String(email) || undefined,
-        fullName: String(fullName) || undefined,
-        password: String(password) || undefined,
-      })
+      await createKitchen.mutateAsync({ name: String(name), district: String(district) })
       toast({ title: 'КШП создано', variant: 'success' })
       event.target.reset()
       setCreateKitchenOpen(false)
       await loadKitchens()
     } catch (error) {
       toast({ title: 'Не удалось создать КШП', description: error.message, variant: 'error' })
-    }
-  }
-
-  const submitKitchenUser = async (event) => {
-    event.preventDefault()
-    if (!selectedKitchenId) return
-
-    const form = new FormData(event.target)
-    const email = form.get('email')
-    const fullName = form.get('fullName')
-    const password = form.get('password')
-
-    if (!email || !fullName || !password) {
-      toast({ title: 'Заполните все поля', variant: 'error' })
-      return
-    }
-
-    try {
-      await createKitchenUser.mutateAsync({
-        kitchenId: selectedKitchenId,
-        payload: {
-          email: String(email),
-          fullName: String(fullName),
-          password: String(password),
-        },
-      })
-      toast({ title: 'Пользователь КШП создан', variant: 'success' })
-      event.target.reset()
-      setCreateUserOpen(false)
-    } catch (error) {
-      toast({ title: 'Не удалось создать пользователя', description: error.message, variant: 'error' })
     }
   }
 
@@ -202,16 +154,9 @@ export default function KitchenPage() {
             : 'Выберите комбинат питания для управления меню'
         }
         actions={
-          <>
-            <Button onClick={() => setCreateKitchenOpen(true)}>
-              <Plus className="h-4 w-4" /> Создать КШП
-            </Button>
-            {selectedKitchen && (
-              <Button onClick={() => setCreateUserOpen(true)}>
-                <UserPlus className="h-4 w-4" /> Создать пользователя КШП
-              </Button>
-            )}
-          </>
+          <Button onClick={() => setCreateKitchenOpen(true)}>
+            <Plus className="h-4 w-4" /> Создать КШП
+          </Button>
         }
       />
 
@@ -268,13 +213,7 @@ export default function KitchenPage() {
               {/* Школы КШП */}
               <Card className="overflow-hidden">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
-                    <Button onClick={() => setAttachOpen(true)}>
-                      <Link className="h-3.5 w-3.5" />
-                      Привязать школу
-                    </Button>
-                  </div>
+                  <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-2">
                   {!schoolsData ? (
@@ -411,42 +350,8 @@ export default function KitchenPage() {
           <Field label="Район">
             <Input name="district" placeholder="Центральный район" />
           </Field>
-          <Field label="E-mail пользователя КШП (логин)">
-            <Input type="email" name="email" placeholder="kitchen@school.by" />
-          </Field>
-          <Field label="ФИО пользователя КШП">
-            <Input name="fullName" placeholder="Иван Петров" />
-          </Field>
-          <Field label="Пароль пользователя КШП" type="password">
-            <Input name="password" placeholder="••••••••" />
-          </Field>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setCreateKitchenOpen(false)}>
-              Отмена
-            </Button>
-            <Button type="submit">Создать</Button>
-          </div>
-        </form>
-      </Dialog>
-
-      <Dialog
-        open={createUserOpen}
-        onOpenChange={setCreateUserOpen}
-        title="Создать пользователя КШП"
-        description={`Пользователь сможет входить в кабинет КШП «${selectedKitchen?.name}»`}
-      >
-        <form onSubmit={submitKitchenUser} className="grid gap-3 p-4">
-          <Field label="E-mail (логин)">
-            <Input type="email" name="email" placeholder="kitchen@school.by" />
-          </Field>
-          <Field label="ФИО">
-            <Input name="fullName" placeholder="Иван Петров" />
-          </Field>
-          <Field label="Пароль" type="password">
-            <Input name="password" placeholder="••••••••" />
-          </Field>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setCreateUserOpen(false)}>
               Отмена
             </Button>
             <Button type="submit">Создать</Button>
