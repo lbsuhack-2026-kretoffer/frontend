@@ -279,7 +279,6 @@ export default function PlatformKitchenPage() {
                       <div>
                         <div className="font-medium text-strong">{kitchen.name}</div>
                         <div className="text-[11px] text-muted">{kitchen.district}</div>
-                        <div className="text-[10px] text-muted">{kitchenSchools.filter((s) => s.kitchenId === kitchen.id).length} школа(й)</div>
                       </div>
                       <Button size="sm" variant="outline" onClick={(e) => {
                         e.stopPropagation()
