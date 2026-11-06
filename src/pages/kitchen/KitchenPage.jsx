@@ -111,6 +111,9 @@ export default function KitchenPage() {
     const form = new FormData(event.target)
     const name = form.get('name')
     const district = form.get('district')
+    const email = form.get('email')
+    const fullName = form.get('fullName')
+    const password = form.get('password')
 
     if (!name || !district) {
       toast({ title: 'Заполните все поля', variant: 'error' })
@@ -118,7 +121,13 @@ export default function KitchenPage() {
     }
 
     try {
-      await createKitchen.mutateAsync({ name: String(name), district: String(district) })
+      await createKitchen.mutateAsync({
+        name: String(name),
+        district: String(district),
+        email: String(email) || undefined,
+        fullName: String(fullName) || undefined,
+        password: String(password) || undefined,
+      })
       toast({ title: 'КШП создано', variant: 'success' })
       event.target.reset()
       setCreateKitchenOpen(false)
@@ -401,6 +410,15 @@ export default function KitchenPage() {
           </Field>
           <Field label="Район">
             <Input name="district" placeholder="Центральный район" />
+          </Field>
+          <Field label="E-mail пользователя КШП (логин)">
+            <Input type="email" name="email" placeholder="kitchen@school.by" />
+          </Field>
+          <Field label="ФИО пользователя КШП">
+            <Input name="fullName" placeholder="Иван Петров" />
+          </Field>
+          <Field label="Пароль пользователя КШП" type="password">
+            <Input name="password" placeholder="••••••••" />
           </Field>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setCreateKitchenOpen(false)}>

@@ -13,6 +13,9 @@ import { useToast } from '@/shared/ui/use-toast'
 function CreateKitchenDialog({ open, onOpenChange }) {
   const [name, setName] = useState('')
   const [district, setDistrict] = useState('')
+  const [email, setEmail] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [password, setPassword] = useState('')
   const { toast } = useToast()
   const createKitchen = useCreateKitchen()
 
@@ -27,10 +30,19 @@ function CreateKitchenDialog({ open, onOpenChange }) {
       return
     }
     try {
-      await createKitchen.mutateAsync({ name: name.trim(), district: district.trim() })
+      await createKitchen.mutateAsync({
+        name: name.trim(),
+        district: district.trim(),
+        email: email.trim() || undefined,
+        fullName: fullName.trim() || undefined,
+        password: password.trim() || undefined,
+      })
       toast({ title: 'КШП создано', variant: 'success' })
       setName('')
       setDistrict('')
+      setEmail('')
+      setFullName('')
+      setPassword('')
       onOpenChange(false)
     } catch (error) {
       toast({ title: 'Не удалось создать КШП', description: error.message, variant: 'error' })
@@ -45,6 +57,15 @@ function CreateKitchenDialog({ open, onOpenChange }) {
         </Field>
         <Field label="Район">
           <Input value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="Центральный район" />
+        </Field>
+        <Field label="E-mail пользователя КШП (логин)">
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="kitchen@school.by" />
+        </Field>
+        <Field label="ФИО пользователя КШП">
+          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Иван Петров" />
+        </Field>
+        <Field label="Пароль пользователя КШП" type="password">
+          <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
         </Field>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
