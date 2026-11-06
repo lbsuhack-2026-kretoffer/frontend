@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Plus, Utensils, UserPlus, Link, Unlink } from 'lucide-react'
+import { Factory, Plus, Utensils, Menu, UserPlus, Link, Unlink } from 'lucide-react'
 import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
