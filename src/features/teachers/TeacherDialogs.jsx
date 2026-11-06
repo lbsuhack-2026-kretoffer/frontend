@@ -12,6 +12,7 @@ const schema = z.object({
   fullName: z.string().min(3, 'Укажите ФИО'),
   email: z.string().email('Некорректный e-mail'),
   position: z.string().min(2, 'Укажите должность'),
+  password: z.string().min(4, 'Пароль не менее 4 символов'),
 })
 
 export function InviteTeacherDialog({ open, onOpenChange, schoolId }) {
@@ -24,7 +25,7 @@ export function InviteTeacherDialog({ open, onOpenChange, schoolId }) {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { fullName: '', email: '', position: 'Учитель' },
+    defaultValues: { fullName: '', email: '', position: 'Учитель', password: '' },
   })
 
   useEffect(() => {
@@ -60,13 +61,16 @@ export function InviteTeacherDialog({ open, onOpenChange, schoolId }) {
     >
       <form id="invite-teacher-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
         <Field label="ФИО" error={errors.fullName?.message}>
-          <Input placeholder="Марина Соловьёва" {...register('fullName')} />
+          <Input placeholder="Марина Соловьёва" {...register('fullName')} maxLength="256" />
         </Field>
         <Field label="E-mail" error={errors.email?.message}>
-          <Input type="email" placeholder="teacher@school.by" {...register('email')} />
+          <Input type="email" placeholder="teacher@school.by" {...register('email')} maxLength="128" />
         </Field>
         <Field label="Должность" error={errors.position?.message}>
-          <Input placeholder="Учитель начальных классов" {...register('position')} />
+          <Input placeholder="Учитель начальных классов" {...register('position')} maxLength="128" />
+        </Field>
+        <Field label="Пароль" type="password" error={errors.password?.message}>
+          <Input placeholder="••••••••" {...register('password')} maxLength="128" />
         </Field>
       </form>
     </Dialog>

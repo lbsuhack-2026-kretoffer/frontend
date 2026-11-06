@@ -18,30 +18,43 @@ export default function TeacherHistoryPage() {
 
   const items = useMemo(() => query.data?.items || [], [query.data?.items])
 
+  const safeItems = useMemo(
+    () =>
+      items.map((item) => ({
+        ...item,
+        absent: item.absentCount ?? 0,
+        students: item.students ?? 0,
+        optOuts: item.optOuts ?? 0,
+        present: item.present ?? Math.max((item.students ?? 0) - (item.absentCount ?? 0), 0),
+        submittedByName: item.submittedByName ?? null,
+      })),
+    [items],
+  )
+
   const classOptions = useMemo(() => {
     const map = new Map()
-    for (const item of items) map.set(item.classId, item.className)
+    for (const item of safeItems) map.set(item.classId, item.className)
     return [...map.entries()].map(([id, name]) => ({ id, name }))
-  }, [items])
+  }, [safeItems])
 
   const filtered = useMemo(() => {
-    if (!classFilter) return items
-    return items.filter((item) => item.classId === classFilter)
-  }, [items, classFilter])
+    if (!classFilter) return safeItems
+    return safeItems.filter((item) => item.classId === classFilter)
+  }, [safeItems, classFilter])
 
   const totals = useMemo(() => {
-    const dates = new Set(items.map((item) => item.date))
-    const present = items.reduce((sum, item) => sum + item.present, 0)
-    const absent = items.reduce((sum, item) => sum + item.absent, 0)
-    const possible = items.reduce((sum, item) => sum + item.students - item.optOuts, 0)
+    const dates = new Set(safeItems.map((item) => item.date))
+    const present = safeItems.reduce((sum, item) => sum + item.present, 0)
+    const absent = safeItems.reduce((sum, item) => sum + item.absent, 0)
+    const possible = safeItems.reduce((sum, item) => sum + item.students - item.optOuts, 0)
     return {
-      marks: items.length,
+      marks: safeItems.length,
       dates: dates.size,
       present,
       absent,
       rate: possible ? present / possible : 0,
     }
-  }, [items])
+  }, [safeItems])
 
   if (query.isLoading) return <PageSkeleton />
   if (query.isError) {

@@ -248,7 +248,7 @@ function CreateGuardDialog({ open, onOpenChange, schoolId }) {
       return
     }
     try {
-      await invite.mutateAsync({ fullName, email, position: 'Охранник', password })
+      await invite.mutateAsync({ fullName, email, position: 'Охранник', password, role: 'guard' })
       toast({ title: 'Охранник добавлен', description: fullName, variant: 'success' })
       setFullName('')
       setEmail('')

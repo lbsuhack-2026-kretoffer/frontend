@@ -18,4 +18,5 @@ export const qk = {
   accessEvents: (schoolId, date) => ['access-events', schoolId, date || 'all'],
   teacherClasses: (date) => ['teacher', 'classes', date || 'all'],
   teacherHistory: (days) => ['teacher', 'history', days || 14],
+  kitchenMenu: (kitchenId) => ['kitchen-menu', kitchenId],
 }

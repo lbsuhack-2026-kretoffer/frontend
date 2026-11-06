@@ -138,7 +138,22 @@ export default function CanteenItemsPage() {
   const [deleting, setDeleting] = useState(null)
 
   const categories = useMemo(() => categoriesQuery.data || [], [categoriesQuery.data])
-  const sales = useMemo(() => salesQuery.data || [], [salesQuery.data])
+  const rawSales = useMemo(() => salesQuery.data || [], [salesQuery.data])
+  const sales = useMemo(
+    () =>
+      rawSales.map((day) => ({
+        ...day,
+        totalQty: day.qty ?? 0,
+        revenue: day.amount ?? 0,
+        wasteQty: 0,
+        byCategory: (day.byCategory || []).map((c) => ({
+          ...c,
+          revenue: c.amount ?? 0,
+          wasteQty: 0,
+        })),
+      })),
+    [rawSales],
+  )
 
   const aggregates = useMemo(() => {
     return categories.map((category) => {

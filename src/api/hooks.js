@@ -57,7 +57,7 @@ export function useSchoolTeachers(schoolId) {
 export function useSchoolStudents(schoolId, query, searchBy = 'surname') {
   return useQuery({
     queryKey: qk.schoolStudents(schoolId, query, searchBy),
-    queryFn: () => api.get(`/schools/${schoolId}/students`, { query: { query, searchBy } }),
+    queryFn: () => api.get(`/schools/${schoolId}/students`, { query: { query, search_by: searchBy } }),
     enabled: Boolean(schoolId),
   })
 }
@@ -337,6 +337,39 @@ export function useDeleteCanteenCategory() {
   const refresh = useRefresh()
   return useMutation({
     mutationFn: (categoryId) => api.delete(`/canteen/categories/${categoryId}`),
+    onSuccess: refresh,
+  })
+}
+
+export function useCreatePlatformAdmin() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: (payload) => api.post('/auth/platform-admins', payload),
+    onSuccess: refresh,
+  })
+}
+
+export function useCreateKitchen() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: (payload) => api.post('/platform/kitchens', payload),
+    onSuccess: refresh,
+  })
+}
+
+export function useKitchenMenu(kitchenId) {
+  return useQuery({
+    queryKey: qk.kitchenMenu(kitchenId),
+    queryFn: () => api.get(`/kitchens/${kitchenId}/menu/day`),
+    enabled: Boolean(kitchenId),
+  })
+}
+
+export function useCreateMenuItem() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: ({ kitchenId, payload }) =>
+      api.post(`/kitchens/${kitchenId}/menu`, payload),
     onSuccess: refresh,
   })
 }

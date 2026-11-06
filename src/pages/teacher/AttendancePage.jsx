@@ -99,7 +99,7 @@ export default function AttendancePage() {
 
   const data = query.data
   const dirty = !setsEqual(absent, savedAbsent)
-  const marked = data.status === 'marked'
+  const marked = data.status === 'submitted'
 
   const toggleStudent = (studentId, checked) => {
     updateAbsent((current) => {
@@ -243,7 +243,7 @@ export default function AttendancePage() {
               ) : (
                 <ul className="divide-y divide-line">
                   {students.map((student) => {
-                    const isOptOut = student.mealStatus === 'optOut'
+                    const isOptOut = student.mealStatus === 'opt_out'
                     const isAbsent = absent.has(student.id)
                     return (
                       <li key={student.id}>

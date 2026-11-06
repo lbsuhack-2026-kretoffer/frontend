@@ -38,12 +38,18 @@ export default function TeacherHomePage() {
 
   const totals = useMemo(() => {
     return classes.reduce(
-      (acc, cls) => ({
-        students: acc.students + cls.students,
-        present: acc.present + cls.present,
-        absent: acc.absent + cls.absent,
-        marked: acc.marked + (cls.status === 'marked' ? 1 : 0),
-      }),
+      (acc, cls) => {
+        const att = cls.attendance
+        const students = cls.studentsCount || 0
+        const absent = att?.absentCount ?? 0
+        const present = Math.max(students - absent, 0)
+        return {
+          students: acc.students + students,
+          present: acc.present + present,
+          absent: acc.absent + absent,
+          marked: acc.marked + (att?.status === 'submitted' ? 1 : 0),
+        }
+      },
       { students: 0, present: 0, absent: 0, marked: 0 },
     )
   }, [classes])
@@ -53,7 +59,7 @@ export default function TeacherHomePage() {
     return <ErrorState description={query.error.message} onRetry={query.refetch} />
   }
 
-  const unmarked = classes.filter((cls) => cls.status === 'unmarked')
+  const unmarked = classes.filter((cls) => !cls.attendance || cls.attendance.status !== 'submitted')
   const deadline = data?.deadline || '09:30'
   const overdue = currentTime() > deadline
   const firstName = user?.fullName?.split(' ')[1] || user?.fullName || ''
@@ -153,15 +159,18 @@ export default function TeacherHomePage() {
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {classes.map((cls) => {
-                  const marked = cls.status === 'marked'
-                  const rate = cls.students ? Math.round((cls.present / cls.students) * 100) : 0
+                  const marked = cls.attendance?.status === 'submitted'
+                  const students = cls.studentsCount || 0
+                  const absent = cls.attendance?.absentCount ?? 0
+                  const present = Math.max(students - absent, 0)
+                  const rate = students ? Math.round((present / students) * 100) : 0
                   return (
                     <div key={cls.id} className="rounded-2xl border border-line p-3.5">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <p className="text-base font-semibold text-strong">{cls.name}</p>
                           <p className="mt-0.5 text-[11px] text-muted">
-                            {studentsLabel(cls.students)} · не обедают {cls.optOuts}
+                            {studentsLabel(cls.studentsCount)} · не обедают 0
                           </p>
                         </div>
                         <Badge tone={AGE_GROUP_TONE[cls.ageGroup]}>{AGE_GROUP_LABELS[cls.ageGroup]}</Badge>
@@ -171,16 +180,15 @@ export default function TeacherHomePage() {
                         <div>
                           <p className="text-xs text-muted">Присутствуют</p>
                           <p className="text-xl font-semibold text-strong">
-                            {formatNumber(cls.present)}
+                            {formatNumber(present)}
                             <span className="ml-1 text-xs font-normal text-subtle">
-                              / {formatNumber(cls.students)}
+                              / {formatNumber(students)}
                             </span>
                           </p>
                         </div>
                         <Badge tone={marked ? 'success' : 'warning'} dot>
                           {marked ? 'Отмечен' : 'Не отмечен'}
-                        </Badge>
-                      </div>
+                        </Badge>                      </div>
 
                       <Progress
                         value={rate}
@@ -191,8 +199,8 @@ export default function TeacherHomePage() {
                       <div className="mt-3 flex items-center justify-between gap-2">
                         <p className="text-[11px] text-muted">
                           {marked
-                            ? `${formatNumber(cls.absent)} отсутствуют${
-                                cls.submittedAt ? ` · ${cls.submittedAt}` : ''
+                            ? `${formatNumber(absent)} отсутствуют${
+                                cls.attendance?.submittedAt ? ` · ${cls.attendance.submittedAt}` : ''
                               }`
                             : `до дедлайна ${deadline}`}
                         </p>

@@ -75,11 +75,27 @@ export default function CanteenPage() {
   const approve = useApproveForecast()
   const { toast } = useToast()
 
-  const forecast = forecastQuery.data
+  const rawForecast = forecastQuery.data
+
+  const forecast = {
+    ...rawForecast,
+    totalForecastQty: rawForecast?.totalPortions ?? 0,
+    expectedRevenue: rawForecast?.expectedRevenue ?? 0,
+    bufferPercent: rawForecast?.bufferPercent ?? 0,
+    absent: rawForecast?.absent ?? 0,
+    optOuts: rawForecast?.optOuts ?? 0,
+    yesterdayTotalQty: rawForecast?.yesterdayTotalQty ?? 0,
+    categories: (rawForecast?.categories || []).map((c) => ({
+      ...c,
+      yesterdayQty: c.yesterdayQty ?? 0,
+      wasteQty: c.wasteQty ?? 0,
+      revenue: c.revenue ?? (c.qty * c.avgPrice),
+    })),
+  }
 
   const chartData = useMemo(
-    () => (forecast?.categories || []).map((category) => ({ name: category.name, qty: category.qty })),
-    [forecast?.categories],
+    () => (forecast.categories || []).map((category) => ({ name: category.name, qty: category.qty })),
+    [forecast.categories],
   )
 
   if (schoolQuery.isLoading || forecastQuery.isLoading) return <PageSkeleton />

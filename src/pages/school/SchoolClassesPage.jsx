@@ -50,7 +50,7 @@ export default function SchoolClassesPage() {
       classes: items.length,
       students: items.reduce((sum, cls) => sum + cls.studentsCount, 0),
       optOuts: items.reduce((sum, cls) => sum + cls.optOutsCount, 0),
-      unmarked: items.filter((cls) => cls.attendance?.status !== 'marked').length,
+      unmarked: items.filter((cls) => !cls.attendance || cls.attendance.status !== 'submitted').length,
     }
   }, [classesQuery.data])
 
@@ -71,10 +71,12 @@ export default function SchoolClassesPage() {
         title="Классы"
         description="Состав классов, возрастные группы и закреплённые учителя."
         actions={
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Добавить класс
-          </Button>
+          user?.role !== 'teacher' ? (
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Добавить класс
+            </Button>
+          ) : null
         }
       />
 
@@ -157,8 +159,8 @@ export default function SchoolClassesPage() {
                   <TD>{formatNumber(cls.optOutsCount)}</TD>
                   <TD>{cls.teacherNames?.join(', ') || <span className="text-subtle">не назначен</span>}</TD>
                   <TD>
-                    <Badge tone={cls.attendance?.status === 'marked' ? 'success' : 'warning'} dot>
-                      {cls.attendance?.status === 'marked'
+                    <Badge tone={cls.attendance?.status === 'submitted' ? 'success' : 'warning'} dot>
+                      {cls.attendance?.status === 'submitted'
                         ? `${formatNumber(cls.attendance.absentCount)} отсутствуют`
                         : 'Не отмечен'}
                     </Badge>

@@ -11,7 +11,7 @@ import { MEAL_STATUS_LABELS } from '@/shared/lib/labels'
 
 const schema = z.object({
   fullName: z.string().min(3, 'Укажите фамилию и имя'),
-  mealStatus: z.enum(['regular', 'optOut']),
+  mealStatus: z.enum(['regular', 'opt_out']),
 })
 
 export function AddStudentDialog({ open, onOpenChange, classId }) {
@@ -59,7 +59,7 @@ export function AddStudentDialog({ open, onOpenChange, classId }) {
     >
       <form id="add-student-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
         <Field label="ФИО" error={errors.fullName?.message}>
-          <Input placeholder="Иванов Иван Иванович" {...register('fullName')} />
+          <Input placeholder="Иванов Иван Иванович" {...register('fullName')} maxLength="256" />
         </Field>
         <Field label="Питание" error={errors.mealStatus?.message}>
           <Select {...register('mealStatus')}>

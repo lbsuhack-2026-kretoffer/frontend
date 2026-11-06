@@ -45,6 +45,14 @@ export default function SchoolDashboardPage() {
   const historyQuery = useForecastHistory(schoolId)
   const classesQuery = useSchoolClasses(schoolId, today)
 
+  if (!schoolId) {
+    return (
+      <ErrorState
+        description="Школа не определена для вашего аккаунта. Обратитесь к администратору платформы."
+      />
+    )
+  }
+
   if (schoolQuery.isLoading || summaryQuery.isLoading || forecastQuery.isLoading) {
     return <PageSkeleton />
   }
@@ -62,9 +70,12 @@ export default function SchoolDashboardPage() {
   }
 
   const school = schoolQuery.data
+  if (!school) {
+    return <ErrorState description="Школа не найдена" />
+  }
   const summary = summaryQuery.data
   const forecast = forecastQuery.data
-  const unmarked = summary.classes.filter((cls) => cls.status === 'unmarked')
+  const unmarked = (classesQuery.data || []).filter((cls) => !cls.attendance || cls.attendance.status !== 'submitted')
   const markedPercent = summary.totalClasses
     ? Math.round((summary.markedClasses / summary.totalClasses) * 100)
     : 0
@@ -233,16 +244,16 @@ export default function SchoolDashboardPage() {
               </div>
             </div>
             <div className="mt-4 space-y-1.5">
-              {summary.classes.map((cls) => (
+              {(classesQuery.data || []).map((cls) => (
                 <div key={cls.id} className="flex items-center justify-between rounded-lg px-1 py-1 text-xs">
                   <span className="flex items-center gap-1.5 text-muted">
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${cls.status === 'marked' ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                      className={`h-1.5 w-1.5 rounded-full ${cls.attendance?.status === 'submitted' ? 'bg-emerald-500' : 'bg-amber-500'}`}
                     />
                     {cls.name}
                   </span>
-                  <span className={cls.status === 'marked' ? 'text-muted' : 'font-medium text-amber-300'}>
-                    {cls.status === 'marked' ? `${cls.present} придут` : 'не отмечен'}
+                  <span className={cls.attendance?.status === 'submitted' ? 'text-muted' : 'font-medium text-amber-300'}>
+                    {cls.attendance?.status === 'submitted' ? `${cls.attendance?.absentCount} придут` : 'не отмечен'}
                   </span>
                 </div>
               ))}

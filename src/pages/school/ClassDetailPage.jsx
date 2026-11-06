@@ -93,7 +93,7 @@ export default function ClassDetailPage() {
     try {
       await updateStudent.mutateAsync({
         studentId: student.id,
-        payload: { mealStatus: checked ? 'regular' : 'optOut' },
+        payload: { mealStatus: checked ? 'regular' : 'opt_out' },
       })
     } catch (error) {
       toast({ title: 'Не удалось обновить статус', description: error.message, variant: 'error' })
@@ -163,10 +163,10 @@ export default function ClassDetailPage() {
         <StatCard label="Не обедают" value={formatNumber(optOuts)} hint={MEAL_STATUS_LABELS.optOut} icon={UserRoundX} tone="amber" />
         <StatCard
           label="Отметка сегодня"
-          value={cls.attendance?.status === 'marked' ? 'Есть' : 'Нет'}
-          hint={cls.attendance?.status === 'marked' ? `${cls.attendance.absentCount} отсутствуют` : 'ожидается до дедлайна'}
+          value={cls.attendance?.status === 'submitted' ? 'Есть' : 'Нет'}
+          hint={cls.attendance?.status === 'submitted' ? `${cls.attendance.absentCount} отсутствуют` : 'ожидается до дедлайна'}
           icon={CheckCircle2}
-          tone={cls.attendance?.status === 'marked' ? 'emerald' : 'amber'}
+          tone={cls.attendance?.status === 'submitted' ? 'emerald' : 'amber'}
         />
         <StatCard label="Учитель" value={cls.teacherNames?.[0] || '—'} hint="закреплён за классом" icon={UserRoundCheck} tone="brand" />
       </div>

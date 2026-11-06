@@ -11,24 +11,25 @@ import { Field, Input, Select } from '@/shared/ui/input'
 const baseSchema = z.object({
   name: z.string().min(2, 'Укажите название школы'),
   city: z.string().min(2, 'Укажите город'),
-  address: z.string().optional(),
+  district: z.string().min(1, 'Укажите район'),
+  address: z.string().min(5, 'Укажите адрес школы'),
   phone: z
     .string()
-    .optional()
+    .min(1, 'Укажите телефон')
     .refine(
-      (val) => !val || /^\+?\d[\d\s-()]{6,}$/.test(val),
+      (val) => /^\+?\d[\d\s-()]{6,}$/.test(val),
       'Некорректный номер телефона',
     ),
-  email: z.union([z.string().email('Некорректный e-mail'), z.literal('')]).optional(),
-  mealPlan: z.enum(['fixed', 'canteen']),
-  timezone: z.string().min(1),
+  email: z.string().email('Некорректный e-mail'),
+  mealPlan: z.enum(['fixed', 'canteen'], { required_error: 'Выберите схему питания' }),
+  timezone: z.string().min(1, 'Укажите часовой пояс'),
   bufferPercent: z.coerce.number().min(0, 'Минимум 0%').max(30, 'Максимум 30%'),
-  attendanceDeadline: z.string().min(1),
+  attendanceDeadline: z.string().min(1, 'Укажите дедлайн отметки'),
 })
 
 const createSchema = baseSchema.extend({
-  adminFullName: z.string().optional(),
-  adminEmail: z.union([z.string().email('Некорректный e-mail'), z.literal('')]).optional(),
+  adminFullName: z.string().min(2, 'Укажите ФИО завуча').optional(),
+  adminEmail: z.string().email('Некорректный e-mail').optional(),
   adminPassword: z.string().min(6, 'Пароль не менее 6 символов').optional(),
   adminPasswordConfirm: z.string().optional(),
 }).refine((data) => {
@@ -60,19 +61,22 @@ function SchoolFields({ register, errors, includeAdmin = false }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <Field label="Название школы" error={errors.name?.message} className="sm:col-span-2">
-        <Input placeholder="Гимназия №12" {...register('name')} />
+        <Input placeholder="Гимназия №12" {...register('name')} maxLength="128" />
       </Field>
       <Field label="Город" error={errors.city?.message}>
-        <Input placeholder="Минск" {...register('city')} />
+        <Input placeholder="Минск" {...register('city')} maxLength="64" />
+      </Field>
+      <Field label="Район" error={errors.district?.message}>
+        <Input placeholder="Центральный" {...register('district')} maxLength="128" />
       </Field>
       <Field label="Адрес" error={errors.address?.message}>
-        <Input placeholder="ул. Кропоткина, 12" {...register('address')} />
+        <Input placeholder="ул. Кропоткина, 12" {...register('address')} maxLength="256" />
       </Field>
       <Field label="Телефон" error={errors.phone?.message}>
-        <Input placeholder="+375 17 ..." {...register('phone')} />
+        <Input placeholder="+375 17 ..." {...register('phone')} maxLength="32" />
       </Field>
       <Field label="E-mail школы" error={errors.email?.message}>
-        <Input placeholder="school@edu.by" {...register('email')} />
+        <Input placeholder="school@edu.by" {...register('email')} maxLength="128" />
       </Field>
       <Field label="Схема питания" error={errors.mealPlan?.message}>
         <Select {...register('mealPlan')}>
@@ -96,16 +100,16 @@ function SchoolFields({ register, errors, includeAdmin = false }) {
       {includeAdmin ? (
         <>
           <Field label="ФИО завуча" error={errors.adminFullName?.message}>
-            <Input placeholder="Иван Петров" {...register('adminFullName')} />
+            <Input placeholder="Иван Петров" {...register('adminFullName')} maxLength="256" />
           </Field>
           <Field label="Логин завуча (e-mail)" error={errors.adminEmail?.message} hint="Будет использоваться для входа в систему">
-            <Input placeholder="zavuch@school.by" {...register('adminEmail')} />
+            <Input placeholder="zavuch@school.by" {...register('adminEmail')} maxLength="128" />
           </Field>
           <Field label="Пароль завуча" type="password" error={errors.adminPassword?.message}>
-            <Input placeholder="••••••••" {...register('adminPassword')} />
+            <Input placeholder="••••••••" {...register('adminPassword')} maxLength="128" />
           </Field>
           <Field label="Повторите пароль" type="password" error={errors.adminPasswordConfirm?.message}>
-            <Input placeholder="••••••••" {...register('adminPasswordConfirm')} />
+            <Input placeholder="••••••••" {...register('adminPasswordConfirm')} maxLength="128" />
           </Field>
         </>
       ) : null}
@@ -185,6 +189,7 @@ export function SchoolEditDialog({ open, onOpenChange, school, scope = 'school' 
       reset({
         name: school.name || '',
         city: school.city || '',
+        district: school.district || '',
         address: school.address || '',
         phone: school.phone || '',
         email: school.email || '',

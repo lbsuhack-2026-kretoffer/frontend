@@ -65,6 +65,9 @@ export default function SchoolSettingsPage() {
   }
 
   const school = schoolQuery.data
+  if (!school) {
+    return <ErrorState description="Школа не найдена" />
+  }
 
   const onSubmit = async (values) => {
     try {

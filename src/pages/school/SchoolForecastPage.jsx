@@ -184,7 +184,7 @@ export default function SchoolForecastPage() {
     }
   }
 
-  const unmarked = summaryQuery.data?.classes?.filter((cls) => cls.status === 'unmarked') || []
+  const unmarked = summaryQuery.data?.classes?.filter((cls) => cls.status === 'pending') || []
 
   if (schoolQuery.isLoading || forecastQuery.isLoading) return <PageSkeleton />
   if (schoolQuery.isError || forecastQuery.isError) {

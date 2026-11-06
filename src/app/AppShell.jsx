@@ -4,6 +4,7 @@ import {
   GraduationCap,
   LogOut,
   Menu,
+  UserPlus,
   X,
 } from 'lucide-react'
 import { useState, Suspense } from 'react'
@@ -25,6 +26,7 @@ import {
 import { cn } from '@/shared/lib/cn'
 import { formatDate, todayISO } from '@/shared/lib/date'
 import { ROLE_LABELS } from '@/shared/lib/labels'
+import { CreatePlatformAdminDialog } from '@/app/CreatePlatformAdminDialog'
 
 function Logo({ compact = false }) {
   return (
@@ -79,6 +81,7 @@ export default function AppShell() {
   const location = useLocation()
   const queryClient = useQueryClient()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [createAdminOpen, setCreateAdminOpen] = useState(false)
   const items = navFor(user?.role)
 
   const handleLogout = () => {
@@ -127,6 +130,12 @@ export default function AppShell() {
             <DropdownMenuContent className="w-60">
               <DropdownMenuLabel>{ROLE_LABELS[user?.role]}</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              {user?.role === 'platform_admin' && (
+                <DropdownMenuItem onClick={() => setCreateAdminOpen(true)}>
+                  <UserPlus className="h-3.5 w-3.5" />
+                  Создать суперадмина
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onSelect={handleLogout} className="text-red-400">
                 <LogOut className="h-3.5 w-3.5" />
                 Выйти
@@ -224,6 +233,7 @@ export default function AppShell() {
           </Button>
         </div>
       </Dialog>
+      <CreatePlatformAdminDialog open={createAdminOpen} onOpenChange={setCreateAdminOpen} />
     </div>
   )
 }
