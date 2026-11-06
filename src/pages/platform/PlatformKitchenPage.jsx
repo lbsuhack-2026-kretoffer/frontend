@@ -129,7 +129,7 @@ export default function PlatformKitchenPage() {
 
   const loadMenu = async (kitchenId) => {
     try {
-      const res = await fetch(`/api/v1/kitchens/${kitchenId}/menu/day`, { credentials: 'include' })
+      const res = await fetch(`/api/v1/platform/kitchens/${kitchenId}/menu/day`, { credentials: 'include' })
       if (!res.ok) throw new Error('Не удалось загрузить меню')
       const data = await res.json()
       setMenuItems(data)

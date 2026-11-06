@@ -360,7 +360,7 @@ export function useCreateKitchen() {
 export function useKitchenMenu(kitchenId) {
   return useQuery({
     queryKey: qk.kitchenMenu(kitchenId),
-    queryFn: () => api.get(`/kitchens/${kitchenId}/menu/day`),
+    queryFn: () => api.get(`/platform/kitchens/${kitchenId}/menu/day`),
     enabled: Boolean(kitchenId),
   })
 }
@@ -369,7 +369,7 @@ export function useCreateMenuItem() {
   const refresh = useRefresh()
   return useMutation({
     mutationFn: ({ kitchenId, payload }) =>
-      api.post(`/kitchens/${kitchenId}/menu`, payload),
+      api.post(`/platform/kitchens/${kitchenId}/menu`, payload),
     onSuccess: refresh,
   })
 }

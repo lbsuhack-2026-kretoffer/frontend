@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Factory, Utensils, Plus, Menu } from 'lucide-react'
-import { useCreateMenuItem } from '@/api/hooks'
+import { useCreateKitchen, useCreateMenuItem } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Dialog } from '@/shared/ui/dialog'
@@ -16,10 +16,12 @@ export default function KitchenPage() {
   const [selectedKitchenId, setSelectedKitchenId] = useState(null)
   const [menuItems, setMenuItems] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
+  const [createKitchenOpen, setCreateKitchenOpen] = useState(false)
   const [loadingKitchens, setLoadingKitchens] = useState(false)
   const [loadingMenu, setLoadingMenu] = useState(false)
 
   const createMenuItem = useCreateMenuItem()
+  const createKitchen = useCreateKitchen()
 
   const loadKitchens = useCallback(async () => {
     setLoadingKitchens(true)
@@ -41,7 +43,7 @@ export default function KitchenPage() {
   const loadMenu = useCallback(async (kitchenId) => {
     setLoadingMenu(true)
     try {
-      const res = await fetch(`/api/v1/kitchens/${kitchenId}/menu/day`, { credentials: 'include' })
+      const res = await fetch(`/api/v1/platform/kitchens/${kitchenId}/menu/day`, { credentials: 'include' })
       if (!res.ok) throw new Error('Не удалось загрузить меню')
       const data = await res.json()
       setMenuItems(data || [])
@@ -90,6 +92,28 @@ export default function KitchenPage() {
     }
   }
 
+  const submitKitchen = async (event) => {
+    event.preventDefault()
+    const form = new FormData(event.target)
+    const name = form.get('name')
+    const district = form.get('district')
+
+    if (!name || !district) {
+      toast({ title: 'Заполните все поля', variant: 'error' })
+      return
+    }
+
+    try {
+      await createKitchen.mutateAsync({ name: String(name), district: String(district) })
+      toast({ title: 'КШП создано', variant: 'success' })
+      event.target.reset()
+      setCreateKitchenOpen(false)
+      await loadKitchens()
+    } catch (error) {
+      toast({ title: 'Не удалось создать КШП', description: error.message, variant: 'error' })
+    }
+  }
+
   if (loadingKitchens) {
     return <div className="flex h-screen items-center justify-center">Загрузка КШП...</div>
   }
@@ -103,6 +127,11 @@ export default function KitchenPage() {
           selectedKitchen
             ? `КШП «${selectedKitchen.name}» · район ${selectedKitchen.district}`
             : 'Выберите комбинат питания для управления меню'
+        }
+        actions={
+          <Button onClick={() => setCreateKitchenOpen(true)}>
+            <Plus className="h-4 w-4" /> Создать КШП
+          </Button>
         }
       />
 
@@ -225,6 +254,28 @@ export default function KitchenPage() {
               Отмена
             </Button>
             <Button type="submit">Добавить</Button>
+          </div>
+        </form>
+      </Dialog>
+
+      <Dialog
+        open={createKitchenOpen}
+        onOpenChange={setCreateKitchenOpen}
+        title="Создать КШП"
+        description="Создайте комбинат питания для района"
+      >
+        <form onSubmit={submitKitchen} className="grid gap-3 p-4">
+          <Field label="Название КШП" className="sm:col-span-2">
+            <Input name="name" placeholder="КШП Центральный" />
+          </Field>
+          <Field label="Район">
+            <Input name="district" placeholder="Центральный район" />
+          </Field>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setCreateKitchenOpen(false)}>
+              Отмена
+            </Button>
+            <Button type="submit">Создать</Button>
           </div>
         </form>
       </Dialog>
