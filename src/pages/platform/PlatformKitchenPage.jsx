@@ -217,12 +217,13 @@ export default function PlatformKitchenPage() {
         eyebrow="Платформа"
         title="КШП / комбинат школьного питания"
         description="Управление комбинатами питания, меню и привязкой школ вашего района"
-      >
-        <Button onClick={() => setCreateOpen(true)}>
-          <Factory className="h-4 w-4" />
-          Создать КШП
-        </Button>
-      </PageHeader>
+        actions={
+          <Button onClick={() => setCreateOpen(true)}>
+            <Factory className="h-4 w-4" />
+            Создать КШП
+          </Button>
+        }
+      />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-12">
         {/* Список КШП */}
