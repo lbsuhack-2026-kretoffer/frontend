@@ -17,6 +17,7 @@ const SchoolTeachersPage = lazy(() => import('@/pages/school/SchoolTeachersPage'
 const SchoolForecastPage = lazy(() => import('@/pages/school/SchoolForecastPage'))
 const SchoolReportsPage = lazy(() => import('@/pages/school/SchoolReportsPage'))
 const SchoolSettingsPage = lazy(() => import('@/pages/school/SchoolSettingsPage'))
+const PlatformKitchenPage = lazy(() => import('@/pages/platform/PlatformKitchenPage'))
 
 const TeacherHomePage = lazy(() => import('@/pages/teacher/TeacherHomePage'))
 const AttendancePage = lazy(() => import('@/pages/teacher/AttendancePage'))
@@ -43,6 +44,7 @@ export default function AppRouter() {
             <Route path="/platform" element={<PlatformDashboardPage />} />
             <Route path="/platform/schools" element={<PlatformSchoolsPage />} />
             <Route path="/platform/schools/:schoolId" element={<PlatformSchoolPage />} />
+            <Route path="/platform/kitchens" element={<PlatformKitchenPage />} />
           </Route>
 
           <Route element={<RoleRoute allow={['school_admin']} />}>

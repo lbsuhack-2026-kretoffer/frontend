@@ -17,6 +17,7 @@ import {
 import { Link, useParams } from 'react-router-dom'
 import {
   useAssignSchoolAdmin,
+  useInviteTeacher,
   useRevokeSchoolAdmin,
   useSchool,
   useSetSchoolAccess,
@@ -44,6 +45,8 @@ import { AGE_GROUP_LABELS, MEAL_PLAN_LABELS, ROLE_LABELS } from '@/shared/lib/la
 function AssignAdminDialog({ open, onOpenChange, schoolId }) {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
   const assign = useAssignSchoolAdmin()
   const { toast } = useToast()
 
@@ -53,11 +56,21 @@ function AssignAdminDialog({ open, onOpenChange, schoolId }) {
       toast({ title: 'Укажите e-mail завуча', variant: 'error' })
       return
     }
+    if (!password.trim()) {
+      toast({ title: 'Укажите пароль завуча', variant: 'error' })
+      return
+    }
+    if (password !== passwordConfirm) {
+      toast({ title: 'Пароли не совпадают', variant: 'error' })
+      return
+    }
     try {
-      await assign.mutateAsync({ schoolId, payload: { fullName, email } })
+      await assign.mutateAsync({ schoolId, payload: { fullName, email, password } })
       toast({ title: 'Завуч назначен', description: email, variant: 'success' })
       setFullName('')
       setEmail('')
+      setPassword('')
+      setPasswordConfirm('')
       onOpenChange(false)
     } catch (error) {
       toast({ title: 'Не удалось назначить', description: error.message, variant: 'error' })
@@ -85,12 +98,211 @@ function AssignAdminDialog({ open, onOpenChange, schoolId }) {
         <Field label="ФИО">
           <Input value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Иван Петров" />
         </Field>
-        <Field label="E-mail" hint="Если пользователь уже есть, ему обновят роль">
+        <Field label="E-mail" hint="Логин для входа в систему">
           <Input
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="zavuch@school.by"
+          />
+        </Field>
+        <Field label="Пароль" type="password">
+          <Input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
+          />
+        </Field>
+        <Field label="Повторите пароль" type="password">
+          <Input
+            type="password"
+            value={passwordConfirm}
+            onChange={(event) => setPasswordConfirm(event.target.value)}
+            placeholder="••••••••"
+          />
+        </Field>
+      </form>
+    </Dialog>
+  )
+}
+
+function CreateTeacherDialog({ open, onOpenChange, schoolId }) {
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [position, setPosition] = useState('Учитель')
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const invite = useInviteTeacher(schoolId)
+  const { toast } = useToast()
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (!fullName.trim()) {
+      toast({ title: 'Укажите ФИО', variant: 'error' })
+      return
+    }
+    if (!email.trim()) {
+      toast({ title: 'Укажите e-mail', variant: 'error' })
+      return
+    }
+    if (!password.trim()) {
+      toast({ title: 'Укажите пароль', variant: 'error' })
+      return
+    }
+    if (password !== passwordConfirm) {
+      toast({ title: 'Пароли не совпадают', variant: 'error' })
+      return
+    }
+    try {
+      await invite.mutateAsync({ fullName, email, position, password })
+      toast({ title: 'Учитель добавлен', description: fullName, variant: 'success' })
+      setFullName('')
+      setEmail('')
+      setPosition('Учитель')
+      setPassword('')
+      setPasswordConfirm('')
+      onOpenChange(false)
+    } catch (error) {
+      toast({ title: 'Не удалось добавить учителя', description: error.message, variant: 'error' })
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Добавить учителя"
+      description="Учитель получит доступ к отметке отсутствующих в своих классах."
+      footer={
+        <>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Отмена
+          </Button>
+          <Button type="submit" form="create-teacher-form" loading={invite.isPending}>
+            Добавить
+          </Button>
+        </>
+      }
+    >
+      <form id="create-teacher-form" onSubmit={submit} className="grid gap-3">
+        <Field label="ФИО">
+          <Input value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Иван Петров" />
+        </Field>
+        <Field label="E-mail" hint="Логин для входа в систему">
+          <Input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="teacher@school.by"
+          />
+        </Field>
+        <Field label="Должность">
+          <Input value={position} onChange={(event) => setPosition(event.target.value)} placeholder="Учитель начальных классов" />
+        </Field>
+        <Field label="Пароль" type="password">
+          <Input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
+          />
+        </Field>
+        <Field label="Повторите пароль" type="password">
+          <Input
+            type="password"
+            value={passwordConfirm}
+            onChange={(event) => setPasswordConfirm(event.target.value)}
+            placeholder="••••••••"
+          />
+        </Field>
+      </form>
+    </Dialog>
+  )
+}
+
+function CreateGuardDialog({ open, onOpenChange, schoolId }) {
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const invite = useInviteTeacher(schoolId)
+  const { toast } = useToast()
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (!fullName.trim()) {
+      toast({ title: 'Укажите ФИО', variant: 'error' })
+      return
+    }
+    if (!email.trim()) {
+      toast({ title: 'Укажите e-mail', variant: 'error' })
+      return
+    }
+    if (!password.trim()) {
+      toast({ title: 'Укажите пароль', variant: 'error' })
+      return
+    }
+    if (password !== passwordConfirm) {
+      toast({ title: 'Пароли не совпадают', variant: 'error' })
+      return
+    }
+    try {
+      await invite.mutateAsync({ fullName, email, position: 'Охранник', password })
+      toast({ title: 'Охранник добавлен', description: fullName, variant: 'success' })
+      setFullName('')
+      setEmail('')
+      setPassword('')
+      setPasswordConfirm('')
+      onOpenChange(false)
+    } catch (error) {
+      toast({ title: 'Не удалось добавить охранника', description: error.message, variant: 'error' })
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Добавить охрану (вахту)"
+      description="Охранник получит доступ к ручной отметке входа/выхода учеников."
+      footer={
+        <>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Отмена
+          </Button>
+          <Button type="submit" form="create-guard-form" loading={invite.isPending}>
+            Добавить
+          </Button>
+        </>
+      }
+    >
+      <form id="create-guard-form" onSubmit={submit} className="grid gap-3">
+        <Field label="ФИО">
+          <Input value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Иван Петров" />
+        </Field>
+        <Field label="E-mail" hint="Логин для входа в систему">
+          <Input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="guard@school.by"
+          />
+        </Field>
+        <Field label="Пароль" type="password">
+          <Input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
+          />
+        </Field>
+        <Field label="Повторите пароль" type="password">
+          <Input
+            type="password"
+            value={passwordConfirm}
+            onChange={(event) => setPasswordConfirm(event.target.value)}
+            placeholder="••••••••"
           />
         </Field>
       </form>
@@ -118,6 +330,8 @@ export default function PlatformSchoolPage() {
 
   const [editOpen, setEditOpen] = useState(false)
   const [assignOpen, setAssignOpen] = useState(false)
+  const [teacherOpen, setTeacherOpen] = useState(false)
+  const [guardOpen, setGuardOpen] = useState(false)
   const [adminToRevoke, setAdminToRevoke] = useState(null)
 
   if (schoolQuery.isLoading) return <PageSkeleton />
@@ -252,10 +466,20 @@ export default function PlatformSchoolPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Администраторы школы</CardTitle>
-                  <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
-                    <Plus className="h-3.5 w-3.5" />
-                    Назначить
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
+                      <Plus className="h-3.5 w-3.5" />
+                      Завуч
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setTeacherOpen(true)}>
+                      <Plus className="h-3.5 w-3.5" />
+                      Учитель
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setGuardOpen(true)}>
+                      <Plus className="h-3.5 w-3.5" />
+                      Охрана
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="pt-2">
                   {!school.admins?.length ? (
@@ -416,6 +640,8 @@ export default function PlatformSchoolPage() {
 
       <SchoolEditDialog open={editOpen} onOpenChange={setEditOpen} school={school} scope="platform" />
       <AssignAdminDialog open={assignOpen} onOpenChange={setAssignOpen} schoolId={schoolId} />
+      <CreateTeacherDialog open={teacherOpen} onOpenChange={setTeacherOpen} schoolId={schoolId} />
+      <CreateGuardDialog open={guardOpen} onOpenChange={setGuardOpen} schoolId={schoolId} />
       <ConfirmDialog
         open={Boolean(adminToRevoke)}
         onOpenChange={(open) => !open && setAdminToRevoke(null)}

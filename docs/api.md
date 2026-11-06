@@ -177,3 +177,144 @@ approvedBy, comment }`
 4. Ошибки — `{ "detail": "..." }`.
 5. Подтверждение заявки и корректировка — по паре `schoolId + date` (один на день).
 6. Супер-админ `u-platform` (`admin@school-balance.by`) уже в БД после сида.
+
+## Что исправить на бэкенде (список для разработчика)
+
+### 1. Модель `User` — добавить поле пароля
+Файл: `app/models.py`
+
+Добавить в класс `User` поле `password_hash` (строка, не nullable, дефолтная пустая строка):
+
+```python
+class User(Base):
+    __tablename__ = "users"
+    id = Column(String, primary_key=True)
+    full_name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    role = Column(String, nullable=False)
+    school_id = Column(String, ForeignKey("schools.id"), nullable=True)
+    position = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)
+    password_hash = Column(String, nullable=False, default="")
+    created_at = Column(Date, nullable=False, default=date.today)
+```
+
+### 2. Хелперы аутентификации
+Файл: `app/auth.py`
+
+Добавить функции хэширования и проверки пароля (pbkdf2/sha256):
+
+```python
+import hashlib
+
+def get_password_hash(password: str) -> str:
+    return hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        settings.secret_key.encode("utf-8"),
+        100_000,
+    ).hex()
+
+def verify_password(plain_password: str, password_hash: str) -> bool:
+    if not password_hash:
+        return False
+    expected = hashlib.pbkdf2_hmac(
+        "sha256",
+        plain_password.encode("utf-8"),
+        settings.secret_key.encode("utf-8"),
+        100_000,
+    ).hex()
+    return hashlib.sha256(expected.encode()).digest() == hashlib.sha256(
+        password_hash.encode()
+    ).digest()
+```
+
+Также добавить функцию `authenticate_user(db, login, password)` — ищет пользователя по `email` или `id`, проверяет пароль, возвращает объект `User` или `None`.
+
+### 3. Вход (`POST /auth/login`)
+Файл: `app/routers/auth.py`
+
+Тело запроса теперь `{ login: string, password: string }` (не `user_id`).
+
+Логика:
+1. Найти пользователя по `email == login` или `id == login`.
+2. Если не найден — `401 { "detail": "Неверный логин или пароль" }`.
+3. Если пароль не совпадает — `401 { "detail": "Неверный логин или пароль" }`.
+4. Если OK — создать сессионный токен, поставить httpOnly-куку `sb_session`, вернуть `User`.
+
+Пример ответа:
+```json
+{
+  "id": "u-platform",
+  "fullName": "Ирина Ковалёва",
+  "email": "admin@school-balance.by",
+  "role": "platform_admin",
+  "schoolId": null,
+  "schoolName": null,
+  "position": "Администратор платформы",
+  "avatarUrl": null
+}
+```
+
+### 4. Регистрация завуча (`POST /platform/schools/:id/admins`)
+Файл: `app/routers/platform.py`
+
+Тело запроса теперь `{ email: string, fullName: string, password: string }` (пароль обязателен).
+
+Логика:
+1. Проверить, существует ли пользователь с таким `email`.
+2. Если нет — создать `User` с ролью `school_admin`, `school_id` = школа, пароль хэшировать через `get_password_hash`.
+3. Если есть — обновить роль на `school_admin`, привязать к школе, обновить пароль если передан.
+4. Создать запись `SchoolAdmin(school_id=..., user_id=...)`.
+5. Вернуть `School`.
+
+### 5. Регистрация учителя и охраны (`POST /schools/:id/teachers`)
+Файл: `app/routers/schools.py`
+
+Тело запроса теперь `{ fullName: string, email: string, position?: string, password: string }` (пароль обязателен).
+
+Роли: `teacher` — учитель, `guard` — охрана (вахта). Фронт передаёт роль через `position` или отдельное поле — бэкенд должен создавать пользователя с соответствующей ролью.
+
+Логика:
+1. Проверить уникальность `email`.
+2. Создать `User` с переданной ролью, `school_id` = школа, пароль хэшировать.
+3. Вернуть `User` с классами.
+
+### 6. Создание школы (`POST /platform/schools`)
+Файл: `app/routers/platform.py`
+
+Тело `SchoolInput` дополнить опциональным полем `adminPassword: string`.
+
+Если передан `adminEmail` + `adminFullName` + `adminPassword` — создать завуча школы сразу с этим паролем.
+
+### 7. Сид — супер-админ
+Файл: `app/seed.py`
+
+Для пользователя `u-platform` (`admin@school-balance.by`) задать:
+```python
+password_hash=get_password_hash("changeme123")
+```
+
+Логин админа: `admin@school-balance.by`, пароль: `changeme123`.
+
+### 8. CORS
+Файл: `app/config.py` / `app/main.py`
+
+Разрешить `credentials: true` и origine фронтенда:
+- Разработка: `http://localhost:5173`
+- Docker: `http://localhost:8080`
+
+### 9. Формат ошибок
+Все ошибки возвращать в формате `{ "detail": "Текст для пользователя" }` со статусом:
+- `400` — невалидные данные
+- `401` — неверный логин/пароль или нет сессии
+- `403` — роль не имеет доступа
+- `404` — объект не найден
+
+### 10. Корректировка и подтверждение заявки
+Хранить по паре `schoolId + date` (одна запись на день):
+- Подтверждение forecast: таблица `forecast_approvals` (ключ `school_id + date`).
+- Ручная корректировка: таблица `forecast_adjustments` (ключ `school_id + date`, поля `delta`, `reason`).
+
+Повторный `POST /adjust` перезаписывает `delta` и `reason`.
+

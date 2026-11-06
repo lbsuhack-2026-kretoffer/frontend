@@ -11,12 +11,14 @@ import {
   ShieldCheck,
   Users,
   Utensils,
+  Factory,
 } from 'lucide-react'
 
 export const NAV_BY_ROLE = {
   platform_admin: [
     { to: '/platform', label: 'Обзор', icon: LayoutDashboard, end: true },
     { to: '/platform/schools', label: 'Школы', icon: School },
+    { to: '/platform/kitchens', label: 'КШП / комбинат питания', icon: Factory },
   ],
   school_admin: [
     { to: '/school', label: 'Дашборд', icon: LayoutDashboard, end: true },
