@@ -33,7 +33,8 @@ export const NAV_BY_ROLE = {
     { to: '/teacher/history', label: 'История', icon: History },
   ],
   canteen: [
-    { to: '/canteen', label: 'Заявка на завтра', icon: ClipboardCheck, end: true },
+    { to: '/kitchen', label: 'Кабинет КШП', icon: Factory, end: true },
+    { to: '/canteen', label: 'Заявка на завтра', icon: ClipboardCheck },
     { to: '/canteen/items', label: 'Шведский стол', icon: Utensils },
     { to: '/canteen/history', label: 'История', icon: ChartNoAxesColumn },
   ],

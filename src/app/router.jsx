@@ -11,6 +11,7 @@ const PlatformDashboardPage = lazy(() => import('@/pages/platform/PlatformDashbo
 const PlatformSchoolsPage = lazy(() => import('@/pages/platform/PlatformSchoolsPage'))
 const PlatformSchoolPage = lazy(() => import('@/pages/platform/PlatformSchoolPage'))
 const PlatformKitchenPage = lazy(() => import('@/pages/platform/PlatformKitchenPage'))
+const KitchenPage = lazy(() => import('@/pages/kitchen/KitchenPage'))
 
 const SchoolDashboardPage = lazy(() => import('@/pages/school/SchoolDashboardPage'))
 const SchoolClassesPage = lazy(() => import('@/pages/school/SchoolClassesPage'))
@@ -52,6 +53,10 @@ export default function AppRouter() {
             <Route path="/platform/schools" element={<WithErrorBoundary component={PlatformSchoolsPage} />} />
             <Route path="/platform/schools/:schoolId" element={<WithErrorBoundary component={PlatformSchoolPage} />} />
             <Route path="/platform/kitchens" element={<WithErrorBoundary component={PlatformKitchenPage} />} />
+          </Route>
+
+          <Route element={<RoleRoute allow={['canteen', 'platform_admin']} />}>
+            <Route path="/kitchen" element={<WithErrorBoundary component={KitchenPage} />} />
           </Route>
 
           <Route element={<RoleRoute allow={['school_admin']} />}>
