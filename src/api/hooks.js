@@ -357,10 +357,19 @@ export function useCreateKitchen() {
   })
 }
 
+export function useCreateKitchenUser() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: ({ kitchenId, payload }) =>
+      api.post(`/platform/kitchens/${kitchenId}/users`, payload),
+    onSuccess: refresh,
+  })
+}
+
 export function useKitchenMenu(kitchenId) {
   return useQuery({
     queryKey: qk.kitchenMenu(kitchenId),
-    queryFn: () => api.get(`/platform/kitchens/${kitchenId}/menu/day`),
+    queryFn: () => api.get(`/kitchen/kitchens/${kitchenId}/menu`),
     enabled: Boolean(kitchenId),
   })
 }
@@ -369,7 +378,7 @@ export function useCreateMenuItem() {
   const refresh = useRefresh()
   return useMutation({
     mutationFn: ({ kitchenId, payload }) =>
-      api.post(`/platform/kitchens/${kitchenId}/menu`, payload),
+      api.post(`/kitchen/kitchens/${kitchenId}/menu`, payload),
     onSuccess: refresh,
   })
 }

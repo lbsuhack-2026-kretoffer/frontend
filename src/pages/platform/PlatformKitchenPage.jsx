@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Plus, Utensils } from 'lucide-react'
-import { useCreateKitchen, useCreateMenuItem } from '@/api/hooks'
+import { Factory, Plus, Utensils, UserPlus } from 'lucide-react'
+import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Dialog } from '@/shared/ui/dialog'
@@ -110,6 +110,7 @@ export default function PlatformKitchenPage() {
   const [menuItems, setMenuItems] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [createUserOpen, setCreateUserOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -129,7 +130,7 @@ export default function PlatformKitchenPage() {
 
   const loadMenu = async (kitchenId) => {
     try {
-      const res = await fetch(`/api/v1/platform/kitchens/${kitchenId}/menu/day`, { credentials: 'include' })
+      const res = await fetch(`/api/v1/kitchen/kitchens/${kitchenId}/menu`, { credentials: 'include' })
       if (!res.ok) throw new Error('Не удалось загрузить меню')
       const data = await res.json()
       setMenuItems(data)
@@ -221,6 +222,10 @@ export default function PlatformKitchenPage() {
                 <Plus className="h-3.5 w-3.5" />
                 Добавить блюдо
               </Button>
+              <Button onClick={() => setCreateUserOpen(true)}>
+                <UserPlus className="h-3.5 w-3.5" />
+                Пользователь КШП
+              </Button>
               <Button variant="outline" onClick={() => setMenuOpen(false)}>
                 Закрыть
               </Button>
@@ -255,6 +260,69 @@ export default function PlatformKitchenPage() {
 
       <CreateKitchenDialog open={createOpen} onOpenChange={setCreateOpen} />
       <MenuItemDialog open={menuOpen} onOpenChange={setMenuOpen} kitchenId={selectedKitchen?.id} />
+
+      <CreateKitchenUserDialog
+        open={createUserOpen}
+        onOpenChange={setCreateUserOpen}
+        kitchenId={selectedKitchen?.id}
+      />
     </>
+  )
+}
+
+function CreateKitchenUserDialog({ open, onOpenChange, kitchenId }) {
+  const [email, setEmail] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [password, setPassword] = useState('')
+  const { toast } = useToast()
+  const createKitchenUser = useCreateKitchenUser()
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (!kitchenId) return
+    if (!email.trim() || !fullName.trim() || !password.trim()) {
+      toast({ title: 'Заполните все поля', variant: 'error' })
+      return
+    }
+    try {
+      await createKitchenUser.mutateAsync({
+        kitchenId,
+        payload: { email: email.trim(), fullName: fullName.trim(), password },
+      })
+      toast({ title: 'Пользователь КШП создан', variant: 'success' })
+      setEmail('')
+      setFullName('')
+      setPassword('')
+      onOpenChange(false)
+    } catch (error) {
+      toast({ title: 'Не удалось создать пользователя', description: error.message, variant: 'error' })
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange} title="Создать пользователя КШП">
+      <form onSubmit={submit} className="grid gap-3 p-4">
+        <Field label="E-mail (логин)">
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="kitchen@school.by"
+          />
+        </Field>
+        <Field label="ФИО">
+          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Иван Петров" />
+        </Field>
+        <Field label="Пароль" type="password">
+          <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+        </Field>
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Отмена
+          </Button>
+          <Button type="submit">Создать</Button>
+        </div>
+      </form>
+    </Dialog>
   )
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Utensils, Plus, Menu } from 'lucide-react'
-import { useCreateKitchen, useCreateMenuItem } from '@/api/hooks'
+import { Factory, Utensils, Plus, Menu, UserPlus } from 'lucide-react'
+import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Dialog } from '@/shared/ui/dialog'
@@ -17,33 +17,34 @@ export default function KitchenPage() {
   const [menuItems, setMenuItems] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [createKitchenOpen, setCreateKitchenOpen] = useState(false)
+  const [createUserOpen, setCreateUserOpen] = useState(false)
   const [loadingKitchens, setLoadingKitchens] = useState(false)
   const [loadingMenu, setLoadingMenu] = useState(false)
 
   const createMenuItem = useCreateMenuItem()
   const createKitchen = useCreateKitchen()
+  const createKitchenUser = useCreateKitchenUser()
 
   const loadKitchens = useCallback(async () => {
     setLoadingKitchens(true)
     try {
-      const res = await fetch('/api/v1/platform/kitchens', { credentials: 'include' })
+      const res = await fetch('/api/v1/kitchen/kitchens', { credentials: 'include' })
       if (!res.ok) throw new Error('Не удалось загрузить список КШП')
       const data = await res.json()
       setKitchens(data)
-      if (!selectedKitchenId && data.length > 0) {
-        setSelectedKitchenId(data[0].id)
-      }
     } catch (error) {
       toast({ title: 'Не удалось загрузить КШП', description: error.message, variant: 'error' })
     } finally {
       setLoadingKitchens(false)
     }
-  }, [selectedKitchenId, toast])
+  }, [toast])
 
   const loadMenu = useCallback(async (kitchenId) => {
     setLoadingMenu(true)
     try {
-      const res = await fetch(`/api/v1/platform/kitchens/${kitchenId}/menu/day`, { credentials: 'include' })
+      const res = await fetch(`/api/v1/kitchen/kitchens/${kitchenId}/menu`, {
+        credentials: 'include',
+      })
       if (!res.ok) throw new Error('Не удалось загрузить меню')
       const data = await res.json()
       setMenuItems(data || [])
@@ -58,11 +59,12 @@ export default function KitchenPage() {
     loadKitchens()
   }, [loadKitchens])
 
+  // Автовыбор первого КШП после загрузки
   useEffect(() => {
-    if (selectedKitchenId) {
-      loadMenu(selectedKitchenId)
+    if (!selectedKitchenId && kitchens.length > 0) {
+      setSelectedKitchenId(kitchens[0].id)
     }
-  }, [selectedKitchenId, loadMenu])
+  }, [kitchens, selectedKitchenId])
 
   const selectedKitchen = kitchens.find((k) => k.id === selectedKitchenId)
 
@@ -114,6 +116,37 @@ export default function KitchenPage() {
     }
   }
 
+  const submitKitchenUser = async (event) => {
+    event.preventDefault()
+    if (!selectedKitchenId) return
+
+    const form = new FormData(event.target)
+    const email = form.get('email')
+    const fullName = form.get('fullName')
+    const password = form.get('password')
+
+    if (!email || !fullName || !password) {
+      toast({ title: 'Заполните все поля', variant: 'error' })
+      return
+    }
+
+    try {
+      await createKitchenUser.mutateAsync({
+        kitchenId: selectedKitchenId,
+        payload: {
+          email: String(email),
+          fullName: String(fullName),
+          password: String(password),
+        },
+      })
+      toast({ title: 'Пользователь КШП создан', variant: 'success' })
+      event.target.reset()
+      setCreateUserOpen(false)
+    } catch (error) {
+      toast({ title: 'Не удалось создать пользователя', description: error.message, variant: 'error' })
+    }
+  }
+
   if (loadingKitchens) {
     return <div className="flex h-screen items-center justify-center">Загрузка КШП...</div>
   }
@@ -129,9 +162,16 @@ export default function KitchenPage() {
             : 'Выберите комбинат питания для управления меню'
         }
         actions={
-          <Button onClick={() => setCreateKitchenOpen(true)}>
-            <Plus className="h-4 w-4" /> Создать КШП
-          </Button>
+          <>
+            <Button onClick={() => setCreateKitchenOpen(true)}>
+              <Plus className="h-4 w-4" /> Создать КШП
+            </Button>
+            {selectedKitchen && (
+              <Button onClick={() => setCreateUserOpen(true)}>
+                <UserPlus className="h-4 w-4" /> Создать пользователя КШП
+              </Button>
+            )}
+          </>
         }
       />
 
@@ -147,7 +187,7 @@ export default function KitchenPage() {
                 <EmptyState
                   icon={Factory}
                   title="КШП не найдены"
-                  description="Создайте первый комбинат питания в разделе Платформа → КШП"
+                  description="Создайте первый комбинат питания"
                 />
               ) : (
                 <div className="space-y-2">
@@ -273,6 +313,31 @@ export default function KitchenPage() {
           </Field>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setCreateKitchenOpen(false)}>
+              Отмена
+            </Button>
+            <Button type="submit">Создать</Button>
+          </div>
+        </form>
+      </Dialog>
+
+      <Dialog
+        open={createUserOpen}
+        onOpenChange={setCreateUserOpen}
+        title="Создать пользователя КШП"
+        description={`Пользователь сможет входить в кабинет КШП «${selectedKitchen?.name}»`}
+      >
+        <form onSubmit={submitKitchenUser} className="grid gap-3 p-4">
+          <Field label="E-mail (логин)">
+            <Input type="email" name="email" placeholder="kitchen@school.by" />
+          </Field>
+          <Field label="ФИО">
+            <Input name="fullName" placeholder="Иван Петров" />
+          </Field>
+          <Field label="Пароль" type="password">
+            <Input name="password" placeholder="••••••••" />
+          </Field>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setCreateUserOpen(false)}>
               Отмена
             </Button>
             <Button type="submit">Создать</Button>
