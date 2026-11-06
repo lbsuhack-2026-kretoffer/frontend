@@ -42,6 +42,7 @@ export async function request(path, options = {}) {
     method,
     credentials: 'include',
     signal,
+    cache: 'no-store',
     headers: {
       Accept: 'application/json',
       ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),

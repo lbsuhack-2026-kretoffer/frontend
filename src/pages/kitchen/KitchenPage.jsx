@@ -30,7 +30,7 @@ export default function KitchenPage() {
   const loadKitchens = useCallback(async () => {
     setLoadingKitchens(true)
     try {
-      const res = await fetch('/api/v1/kitchen/kitchens', { credentials: 'include' })
+      const res = await fetch('/api/v1/kitchen/kitchens', { credentials: 'include', cache: 'no-store' })
       if (!res.ok) throw new Error('Не удалось загрузить список КШП')
       const data = await res.json()
       setKitchens(data)
@@ -42,12 +42,14 @@ export default function KitchenPage() {
   }, [toast])
 
   const loadMenu = useCallback(async (kitchenId) => {
+    if (!kitchenId) return
     setLoadingMenu(true)
     try {
       const res = await fetch(`/api/v1/kitchen/kitchens/${kitchenId}/menu`, {
         credentials: 'include',
+        cache: 'no-store',
       })
-      if (!res.ok) throw new Error('Не удалось загрузить меню')
+      if (!res.ok) throw new Error(`Ошибка ${res.status}: не удалось загрузить меню`)
       const data = await res.json()
       setMenuItems(data || [])
     } catch (error) {

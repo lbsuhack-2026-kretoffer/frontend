@@ -169,7 +169,7 @@ export default function PlatformKitchenPage() {
   const loadKitchens = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/v1/platform/kitchens', { credentials: 'include' })
+      const res = await fetch('/api/v1/platform/kitchens', { credentials: 'include', cache: 'no-store' })
       if (!res.ok) throw new Error('Не удалось загрузить КШП')
       const data = await res.json()
       setKitchens(data)
@@ -181,11 +181,12 @@ export default function PlatformKitchenPage() {
   }, [toast])
 
   const loadMenu = async (kitchenId) => {
+    if (!kitchenId) return
     try {
-      const res = await fetch(`/api/v1/kitchen/kitchens/${kitchenId}/menu`, { credentials: 'include' })
-      if (!res.ok) throw new Error('Не удалось загрузить меню')
+      const res = await fetch(`/api/v1/kitchen/kitchens/${kitchenId}/menu`, { credentials: 'include', cache: 'no-store' })
+      if (!res.ok) throw new Error(`Ошибка ${res.status}: не удалось загрузить меню`)
       const data = await res.json()
-      setMenuItems(data)
+      setMenuItems(data || [])
     } catch (error) {
       toast({ title: 'Не удалось загрузить меню', description: error.message, variant: 'error' })
     }
