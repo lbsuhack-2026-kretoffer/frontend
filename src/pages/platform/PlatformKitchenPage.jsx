@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Plus, Utensils, UserPlus } from 'lucide-react'
-import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem } from '@/api/hooks'
+import { Factory, Plus, Utensils, UserPlus, Link, Unlink } from 'lucide-react'
+import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Dialog } from '@/shared/ui/dialog'
 import { EmptyState } from '@/shared/ui/empty-state'
-import { Field, Input } from '@/shared/ui/input'
+import { Field, Input, Select } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
 import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
 import { useToast } from '@/shared/ui/use-toast'
@@ -104,15 +104,67 @@ function MenuItemDialog({ open, onOpenChange, kitchenId }) {
   )
 }
 
+function AttachSchoolDialog({ open, onOpenChange, kitchenId, schools }) {
+  const [schoolId, setSchoolId] = useState('')
+  const { toast } = useToast()
+  const setSchoolKitchen = useSetSchoolKitchen()
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (!schoolId) {
+      toast({ title: 'Выберите школу', variant: 'error' })
+      return
+    }
+    try {
+      await setSchoolKitchen.mutateAsync({ schoolId, kitchenId })
+      toast({ title: 'Школа привязана к КШП', variant: 'success' })
+      setSchoolId('')
+      onOpenChange(false)
+    } catch (error) {
+      toast({ title: 'Не удалось привязать школу', description: error.message, variant: 'error' })
+    }
+  }
+
+  const available = schools.filter((s) => !s.kitchenId)
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange} title="Привязать школу к КШП">
+      <form onSubmit={submit} className="grid gap-3 p-4">
+        <Field label="Школа" className="sm:col-span-2">
+          <Select value={schoolId} onValueChange={setSchoolId}>
+            <option value="">Выберите школу</option>
+            {available.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name} · {s.city}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Отмена
+          </Button>
+          <Button type="submit" disabled={!schoolId}>
+            Привязать
+          </Button>
+        </div>
+      </form>
+    </Dialog>
+  )
+}
+
 export default function PlatformKitchenPage() {
   const [kitchens, setKitchens] = useState([])
   const [selectedKitchen, setSelectedKitchen] = useState(null)
   const [menuItems, setMenuItems] = useState([])
+  const [kitchenSchools, setKitchenSchools] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [createUserOpen, setCreateUserOpen] = useState(false)
+  const [attachOpen, setAttachOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const setSchoolKitchen = useSetSchoolKitchen()
 
   const loadKitchens = useCallback(async () => {
     setLoading(true)
@@ -126,7 +178,7 @@ export default function PlatformKitchenPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [toast])
 
   const loadMenu = async (kitchenId) => {
     try {
@@ -139,16 +191,31 @@ export default function PlatformKitchenPage() {
     }
   }
 
+  const { data: schoolsData } = useKitchenSchools(selectedKitchen?.id)
+
+  useEffect(() => {
+    if (schoolsData) setKitchenSchools(schoolsData)
+  }, [schoolsData])
+
   useEffect(() => {
     loadKitchens()
   }, [])
+
+  const detachSchool = async (schoolId) => {
+    try {
+      await setSchoolKitchen.mutateAsync({ schoolId, kitchenId: null })
+      toast({ title: 'Школа отвязана от КШП', variant: 'success' })
+    } catch (error) {
+      toast({ title: 'Не удалось отвязать школу', description: error.message, variant: 'error' })
+    }
+  }
 
   return (
     <>
       <PageHeader
         eyebrow="Платформа"
         title="КШП / комбинат школьного питания"
-        description="Управление комбинатами питания и меню с ценами для школ вашего района"
+        description="Управление комбинатами питания, меню и привязкой школ вашего района"
       >
         <Button onClick={() => setCreateOpen(true)}>
           <Factory className="h-4 w-4" />
@@ -156,98 +223,58 @@ export default function PlatformKitchenPage() {
         </Button>
       </PageHeader>
 
-      <div className="mt-6 grid gap-4">
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle>Список КШП</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-2">
-            {loading ? (
-              <div className="h-64 animate-pulse rounded-xl bg-elevated" />
-            ) : kitchens.length === 0 ? (
-              <EmptyState
-                icon={Factory}
-                title="КШП пока нет"
-                description="Создайте первый комбинат питания"
-                action={
-                  <Button onClick={() => setCreateOpen(true)}>
-                    <Plus className="h-4 w-4" />
-                    Создать
-                  </Button>
-                }
-              />
-            ) : (
-              <Table>
-                <THead>
-                  <TR>
-                    <TH>Название</TH>
-                    <TH>Район</TH>
-                    <TH>Блюд в меню</TH>
-                    <TH className="text-right">Действия</TH>
-                  </TR>
-                </THead>
-                <TBody>
-                  {kitchens.map((kitchen) => (
-                    <TR key={kitchen.id}>
-                      <TD className="font-medium text-strong">{kitchen.name}</TD>
-                      <TD>{kitchen.district}</TD>
-                      <TD>{menuItems.filter(i => i.kitchen_id === kitchen.id).length}</TD>
-                      <TD>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedKitchen(kitchen)
-                            setMenuOpen(true)
-                            loadMenu(kitchen.id)
-                          }}
-                        >
-                          <Utensils className="h-3.5 w-3.5" />
-                          Меню
-                        </Button>
-                      </TD>
-                    </TR>
-                  ))}
-                </TBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-
-        {selectedKitchen && (
+      <div className="mt-6 grid gap-4 lg:grid-cols-12">
+        {/* Список КШП */}
+        <div className="lg:col-span-4">
           <Card className="overflow-hidden">
             <CardHeader>
-              <CardTitle>Меню КШП: {selectedKitchen.name}</CardTitle>
-              <Button onClick={() => setMenuOpen(true)}>
-                <Plus className="h-3.5 w-3.5" />
-                Добавить блюдо
-              </Button>
-              <Button onClick={() => setCreateUserOpen(true)}>
-                <UserPlus className="h-3.5 w-3.5" />
-                Пользователь КШП
-              </Button>
-              <Button variant="outline" onClick={() => setMenuOpen(false)}>
-                Закрыть
-              </Button>
+              <CardTitle>Список КШП</CardTitle>
             </CardHeader>
             <CardContent className="pt-2">
               {loading ? (
                 <div className="h-64 animate-pulse rounded-xl bg-elevated" />
-              ) : menuItems.length === 0 ? (
-                <EmptyState icon={Utensils} title="Блюд пока нет" description="Добавьте первое блюдо в меню" />
+              ) : kitchens.length === 0 ? (
+                <EmptyState
+                  icon={Factory}
+                  title="КШП пока нет"
+                  description="Создайте первый комбинат питания"
+                  action={
+                    <Button onClick={() => setCreateOpen(true)}>
+                      <Plus className="h-4 w-4" />
+                      Создать
+                    </Button>
+                  }
+                />
               ) : (
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Блюдо</TH>
-                      <TH>Цена, BYN</TH>
+                      <TH>Название</TH>
+                      <TH>Район</TH>
+                      <TH>Школ</TH>
+                      <TH className="text-right">Действия</TH>
                     </TR>
                   </THead>
                   <TBody>
-                    {menuItems.map((item) => (
-                      <TR key={item.id}>
-                        <TD>{item.name}</TD>
-                        <TD>{item.price.toFixed(2)}</TD>
+                    {kitchens.map((kitchen) => (
+                      <TR key={kitchen.id}>
+                        <TD className="font-medium text-strong">{kitchen.name}</TD>
+                        <TD>{kitchen.district}</TD>
+                        <TD>{kitchenSchools.filter((s) => s.kitchenId === kitchen.id).length}</TD>
+                        <TD>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedKitchen(kitchen)
+                              setMenuOpen(true)
+                              loadMenu(kitchen.id)
+                            }}
+                          >
+                            <Utensils className="h-3.5 w-3.5" />
+                            Меню
+                          </Button>
+                        </TD>
                       </TR>
                     ))}
                   </TBody>
@@ -255,16 +282,134 @@ export default function PlatformKitchenPage() {
               )}
             </CardContent>
           </Card>
-        )}
+        </div>
+
+        {/* Детали КШП: меню + школы */}
+        <div className="lg:col-span-8">
+          {!selectedKitchen ? (
+            <EmptyState
+              icon={Menu}
+              title="Выберите КШП"
+              description="Выберите комбинат питания слева, чтобы управлять меню и школами"
+            />
+          ) : (
+            <>
+              {/* Школы КШП */}
+              <Card className="overflow-hidden">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
+                    <Button onClick={() => setAttachOpen(true)}>
+                      <Link className="h-3.5 w-3.5" />
+                      Привязать школу
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  {kitchenSchools.length === 0 ? (
+                    <EmptyState
+                      icon={Link}
+                      title="Школ пока нет"
+                      description="Привяжите школы этого района к КШП"
+                      action={
+                        <Button onClick={() => setAttachOpen(true)}>
+                          <Link className="h-3.5 w-3.5" />
+                          Привязать первую школу
+                        </Button>
+                      }
+                    />
+                  ) : (
+                    <Table>
+                      <THead>
+                        <TR>
+                          <TH>Школа</TH>
+                          <TH>Город</TH>
+                          <TH>Учеников</TH>
+                          <TH className="text-right">Действия</TH>
+                        </TR>
+                      </THead>
+                      <TBody>
+                        {kitchenSchools.map((school) => (
+                          <TR key={school.id}>
+                            <TD className="font-medium text-strong">{school.name}</TD>
+                            <TD>{school.city}</TD>
+                            <TD>{school.studentsCount}</TD>
+                            <TD>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => detachSchool(school.id)}
+                                aria-label="Отвязать школу"
+                              >
+                                <Unlink className="h-3.5 w-3.5 text-red-400" />
+                              </Button>
+                            </TD>
+                          </TR>
+                        ))}
+                      </TBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Меню КШП */}
+              <Card className="overflow-hidden mt-4">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Меню КШП: {selectedKitchen.name}</CardTitle>
+                    <Button onClick={() => setMenuOpen(true)}>
+                      <Plus className="h-3.5 w-3.5" />
+                      Добавить блюдо
+                    </Button>
+                    <Button onClick={() => setCreateUserOpen(true)}>
+                      <UserPlus className="h-3.5 w-3.5" />
+                      Пользователь КШП
+                    </Button>
+                    <Button variant="outline" onClick={() => setMenuOpen(false)}>
+                      Закрыть
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  {menuItems.length === 0 ? (
+                    <EmptyState icon={Utensils} title="Блюд пока нет" description="Добавьте первое блюдо в меню" />
+                  ) : (
+                    <Table>
+                      <THead>
+                        <TR>
+                          <TH>Блюдо</TH>
+                          <TH className="text-right">Цена, BYN</TH>
+                        </TR>
+                      </THead>
+                      <TBody>
+                        {menuItems.map((item) => (
+                          <TR key={item.id}>
+                            <TD>{item.name}</TD>
+                            <TD className="text-right">{item.price.toFixed(2)}</TD>
+                          </TR>
+                        ))}
+                      </TBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
       </div>
 
       <CreateKitchenDialog open={createOpen} onOpenChange={setCreateOpen} />
       <MenuItemDialog open={menuOpen} onOpenChange={setMenuOpen} kitchenId={selectedKitchen?.id} />
-
       <CreateKitchenUserDialog
         open={createUserOpen}
         onOpenChange={setCreateUserOpen}
         kitchenId={selectedKitchen?.id}
+      />
+      <AttachSchoolDialog
+        open={attachOpen}
+        onOpenChange={setAttachOpen}
+        kitchenId={selectedKitchen?.id}
+        schools={kitchenSchools}
       />
     </>
   )

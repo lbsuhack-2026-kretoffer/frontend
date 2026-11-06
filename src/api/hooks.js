@@ -366,6 +366,23 @@ export function useCreateKitchenUser() {
   })
 }
 
+export function useKitchenSchools(kitchenId) {
+  return useQuery({
+    queryKey: qk.school(kitchenId),
+    queryFn: () => api.get(`/platform/kitchens/${kitchenId}/schools`),
+    enabled: Boolean(kitchenId),
+  })
+}
+
+export function useSetSchoolKitchen() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: ({ schoolId, kitchenId }) =>
+      api.patch(`/platform/schools/${schoolId}/kitchen`, { kitchenId: kitchenId || null }),
+    onSuccess: refresh,
+  })
+}
+
 export function useKitchenMenu(kitchenId) {
   return useQuery({
     queryKey: qk.kitchenMenu(kitchenId),

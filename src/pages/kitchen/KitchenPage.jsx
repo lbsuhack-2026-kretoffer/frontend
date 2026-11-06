@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Utensils, Plus, Menu, UserPlus } from 'lucide-react'
-import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem } from '@/api/hooks'
+import { Factory, Utensils, Plus, Menu, UserPlus, Link, Unlink } from 'lucide-react'
+import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Dialog } from '@/shared/ui/dialog'
 import { EmptyState } from '@/shared/ui/empty-state'
-import { Field, Input } from '@/shared/ui/input'
+import { Field, Input, Select } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
 import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
 import { useToast } from '@/shared/ui/use-toast'
@@ -18,12 +18,14 @@ export default function KitchenPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [createKitchenOpen, setCreateKitchenOpen] = useState(false)
   const [createUserOpen, setCreateUserOpen] = useState(false)
+  const [attachOpen, setAttachOpen] = useState(false)
   const [loadingKitchens, setLoadingKitchens] = useState(false)
   const [loadingMenu, setLoadingMenu] = useState(false)
 
   const createMenuItem = useCreateMenuItem()
   const createKitchen = useCreateKitchen()
   const createKitchenUser = useCreateKitchenUser()
+  const setSchoolKitchen = useSetSchoolKitchen()
 
   const loadKitchens = useCallback(async () => {
     setLoadingKitchens(true)
@@ -55,6 +57,8 @@ export default function KitchenPage() {
     }
   }, [toast])
 
+  const { data: schoolsData } = useKitchenSchools(selectedKitchenId)
+
   useEffect(() => {
     loadKitchens()
   }, [loadKitchens])
@@ -65,6 +69,12 @@ export default function KitchenPage() {
       setSelectedKitchenId(kitchens[0].id)
     }
   }, [kitchens, selectedKitchenId])
+
+  useEffect(() => {
+    if (schoolsData) {
+      // schoolsData уже приходит отфильтрованным по kitchenId бэкендом
+    }
+  }, [schoolsData])
 
   const selectedKitchen = kitchens.find((k) => k.id === selectedKitchenId)
 
@@ -147,6 +157,25 @@ export default function KitchenPage() {
     }
   }
 
+  const attachSchool = async (schoolId) => {
+    try {
+      await setSchoolKitchen.mutateAsync({ schoolId, kitchenId: selectedKitchenId })
+      toast({ title: 'Школа привязана к КШП', variant: 'success' })
+      setAttachOpen(false)
+    } catch (error) {
+      toast({ title: 'Не удалось привязать школу', description: error.message, variant: 'error' })
+    }
+  }
+
+  const detachSchool = async (schoolId) => {
+    try {
+      await setSchoolKitchen.mutateAsync({ schoolId, kitchenId: null })
+      toast({ title: 'Школа отвязана от КШП', variant: 'success' })
+    } catch (error) {
+      toast({ title: 'Не удалось отвязать школу', description: error.message, variant: 'error' })
+    }
+  }
+
   if (loadingKitchens) {
     return <div className="flex h-screen items-center justify-center">Загрузка КШП...</div>
   }
@@ -215,28 +244,88 @@ export default function KitchenPage() {
           </Card>
         </div>
 
-        {/* Меню выбранного КШП */}
+        {/* Детали КШП */}
         <div className="lg:col-span-8">
           {!selectedKitchen ? (
             <EmptyState
               icon={Menu}
               title="Выберите КШП"
-              description="Выберите комбинат питания слева, чтобы управлять его меню"
+              description="Выберите комбинат питания слева, чтобы управлять его меню и школами"
             />
           ) : (
             <>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-strong">Меню на день</h2>
-                <Button onClick={() => setCreateOpen(true)}>
-                  <Plus className="h-4 w-4" /> Добавить блюдо
-                </Button>
-              </div>
-
+              {/* Школы КШП */}
               <Card className="overflow-hidden">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
+                    <Button onClick={() => setAttachOpen(true)}>
+                      <Link className="h-3.5 w-3.5" />
+                      Привязать школу
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  {!schoolsData ? (
+                    <div className="h-40 animate-pulse rounded-xl bg-elevated" />
+                  ) : schoolsData.length === 0 ? (
+                    <EmptyState
+                      icon={Link}
+                      title="Школ пока нет"
+                      description="Привяжите школы этого района к КШП"
+                      action={
+                        <Button onClick={() => setAttachOpen(true)}>
+                          <Link className="h-3.5 w-3.5" />
+                          Привязать первую школу
+                        </Button>
+                      }
+                    />
+                  ) : (
+                    <Table>
+                      <THead>
+                        <TR>
+                          <TH>Школа</TH>
+                          <TH>Город</TH>
+                          <TH>Учеников</TH>
+                          <TH className="text-right">Действия</TH>
+                        </TR>
+                      </THead>
+                      <TBody>
+                        {schoolsData.map((school) => (
+                          <TR key={school.id}>
+                            <TD className="font-medium text-strong">{school.name}</TD>
+                            <TD>{school.city}</TD>
+                            <TD>{school.studentsCount}</TD>
+                            <TD>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => detachSchool(school.id)}
+                                aria-label="Отвязать школу"
+                              >
+                                <Unlink className="h-3.5 w-3.5 text-red-400" />
+                              </Button>
+                            </TD>
+                          </TR>
+                        ))}
+                      </TBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Меню выбранного КШП */}
+              <Card className="overflow-hidden mt-4">
                 <CardHeader>
                   <CardTitle>{selectedKitchen.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-2">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-strong">Меню на день</h2>
+                    <Button onClick={() => setCreateOpen(true)}>
+                      <Plus className="h-4 w-4" /> Добавить блюдо
+                    </Button>
+                  </div>
                   {loadingMenu ? (
                     <div className="h-64 animate-pulse rounded-xl bg-elevated" />
                   ) : menuItems.length === 0 ? (
@@ -341,6 +430,37 @@ export default function KitchenPage() {
               Отмена
             </Button>
             <Button type="submit">Создать</Button>
+          </div>
+        </form>
+      </Dialog>
+
+      <Dialog
+        open={attachOpen}
+        onOpenChange={setAttachOpen}
+        title="Привязать школу к КШП"
+        description={`Выберите школу для привязки к «${selectedKitchen?.name}»`}
+      >
+        <form onSubmit={(e) => {
+          e.preventDefault()
+          const form = new FormData(e.target)
+          const schoolId = form.get('schoolId')
+          if (schoolId) attachSchool(schoolId)
+        }} className="grid gap-3 p-4">
+          <Field label="Школа" className="sm:col-span-2">
+            <Select>
+              <option value="">Выберите школу</option>
+              {schoolsData?.filter((s) => !s.kitchenId).map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name} · {s.city}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setAttachOpen(false)}>
+              Отмена
+            </Button>
+            <Button type="submit">Привязать</Button>
           </div>
         </form>
       </Dialog>
