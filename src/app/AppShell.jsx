@@ -4,9 +4,6 @@ import {
   GraduationCap,
   LogOut,
   Menu,
-  MonitorSmartphone,
-  RefreshCcw,
-  UserRound,
   X,
 } from 'lucide-react'
 import { useState, Suspense } from 'react'
@@ -90,13 +87,6 @@ export default function AppShell() {
     navigate('/login', { replace: true })
   }
 
-  const handleReset = () => {
-    logout()
-    queryClient.clear()
-    sessionStorage.removeItem('sbp-session')
-    window.location.assign('/login')
-  }
-
   const activeItem =
     items.find((item) => item.to === location.pathname) ||
     items.find((item) => item.to !== '/' && location.pathname.startsWith(item.to))
@@ -116,10 +106,6 @@ export default function AppShell() {
           <NavList items={items} />
         </div>
         <div className="border-t border-line p-3">
-          <div className="mb-2 flex items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] font-medium text-amber-300">
-            <MonitorSmartphone className="h-3.5 w-3.5" />
-            Демо-режим
-          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -140,14 +126,6 @@ export default function AppShell() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60">
               <DropdownMenuLabel>{ROLE_LABELS[user?.role]}</DropdownMenuLabel>
-              <DropdownMenuItem onSelect={() => navigate('/login')}>
-                <UserRound className="h-3.5 w-3.5" />
-                Сменить роль
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleReset}>
-                <RefreshCcw className="h-3.5 w-3.5" />
-                Сбросить демо
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={handleLogout} className="text-red-400">
                 <LogOut className="h-3.5 w-3.5" />
@@ -240,9 +218,6 @@ export default function AppShell() {
         </div>
         <NavList items={items} onNavigate={() => setMobileOpen(false)} />
         <div className="mt-4 grid gap-2 border-t border-line pt-4">
-          <Button variant="outline" onClick={() => { setMobileOpen(false); navigate('/login') }}>
-            Сменить роль
-          </Button>
           <Button variant="danger-outline" onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
             Выйти

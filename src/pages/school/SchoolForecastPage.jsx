@@ -8,13 +8,17 @@ import {
   Save,
   SlidersHorizontal,
   Utensils,
+  X,
 } from 'lucide-react'
 import {
   useApproveForecast,
   useAttendanceSummary,
   useForecast,
+  useForecastAdjustments,
   useForecastHistory,
+  useRemoveForecastAdjustment,
   useSchool,
+  useSetForecastAdjustment,
   useUpdateSchool,
 } from '@/api/hooks'
 import { useSession } from '@/features/auth/session'
@@ -76,6 +80,62 @@ function ApprovalDialog({ open, onOpenChange, forecast, onSubmit, loading }) {
   )
 }
 
+function AdjustmentDialog({
+  open,
+  onOpenChange,
+  adjustment,
+  forecastDate,
+  totalPortions,
+  onSubmit,
+  loading,
+}) {
+  const [delta, setDelta] = useState(String(adjustment?.delta ?? ''))
+  const [reason, setReason] = useState(adjustment?.reason ?? '')
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Ручная корректировка заявки"
+      description={`Дата: ${formatDate(forecastDate, 'd MMMM')} · прогноз модели ${portionsLabel(totalPortions)}`}
+    >
+      <Field label="Корректировка, порций" hint="Положительное число — больше обедов, отрицательное — меньше">
+        <Input
+          type="number"
+          value={delta}
+          onChange={(event) => setDelta(event.target.value)}
+          placeholder="Например: -10"
+        />
+      </Field>
+      <Field label="Причина" hint="Например: экскурсия 10А, спортсоревнования">
+        <Textarea
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          placeholder="Например: 10 человек уехали на экскурсию"
+        />
+      </Field>
+      <div className="mt-3 text-[11px] text-muted">
+        Корректировка прибавляется к прогнозу модели. При отрицательном значении заявка уменьшается, но не ниже нуля.
+      </div>
+      <>
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          Отмена
+        </Button>
+        <Button
+          loading={loading}
+          onClick={() => {
+            onSubmit(Number(delta) || 0, reason)
+            setDelta('')
+            setReason('')
+          }}
+        >
+          Применить
+        </Button>
+      </>
+    </Dialog>
+  )
+}
+
 export default function SchoolForecastPage() {
   const user = useSession((state) => state.user)
   const schoolId = user?.schoolId
@@ -89,9 +149,40 @@ export default function SchoolForecastPage() {
   const summaryQuery = useAttendanceSummary(schoolId, todayISO())
   const updateSchool = useUpdateSchool()
   const approve = useApproveForecast()
+  const adjustmentsQuery = useForecastAdjustments(schoolId)
+  const setAdjustment = useSetForecastAdjustment()
+  const removeAdjustment = useRemoveForecastAdjustment()
   const { toast } = useToast()
 
   const forecast = forecastQuery.data
+
+  const [adjustOpen, setAdjustOpen] = useState(false)
+
+  const adjustment = adjustmentsQuery.data?.find((a) => a.date === date) || null
+
+  const handleSetAdjustment = async (delta, reason) => {
+    try {
+      await setAdjustment.mutateAsync({ schoolId, date, delta, reason })
+      setAdjustOpen(false)
+      toast({
+        title: 'Корректировка применена',
+        description: `${delta > 0 ? '+' : ''}${delta} порций${reason ? ' · ' + reason : ''}`,
+        variant: 'success',
+      })
+    } catch (error) {
+      toast({ title: 'Не удалось применить корректировку', description: error.message, variant: 'error' })
+    }
+  }
+
+  const handleRemoveAdjustment = async () => {
+    try {
+      await removeAdjustment.mutateAsync({ schoolId, date })
+      setAdjustOpen(false)
+      toast({ title: 'Корректировка сброшена', variant: 'success' })
+    } catch (error) {
+      toast({ title: 'Не удалось сбросить корректировку', description: error.message, variant: 'error' })
+    }
+  }
 
   const unmarked = summaryQuery.data?.classes?.filter((cls) => cls.status === 'unmarked') || []
 
@@ -249,6 +340,37 @@ export default function SchoolForecastPage() {
             <p className="mt-1 text-xs text-muted">по истории точности</p>
           </div>
         </div>
+
+        {adjustment ? (
+          <div className="mt-4 flex items-start gap-2.5 rounded-2xl border border-brand-500/30 bg-brand-500/10 px-4 py-3">
+            <SlidersHorizontal className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
+            <div>
+              <p className="text-xs text-brand-200">
+                Ручная корректировка:{' '}
+                <span className="font-semibold text-brand-800">
+                  {adjustment.delta > 0 ? '+' : ''}{adjustment.delta} порций
+                </span>
+                {adjustment.reason ? ` · ${adjustment.reason}` : ''}
+              </p>
+              <p className="mt-0.5 text-[10px] text-brand-200">
+                Установлено {adjustment.createdBy ? adjustment.createdBy : '—'} ·
+                {adjustment.createdAt ? formatDate(adjustment.createdAt, 'd MMM, HH:mm') : '—'}
+              </p>
+            </div>
+            <Button size="icon" onClick={handleRemoveAdjustment} aria-label="Сбросить корректировку">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : null}
+
+        <Button
+          onClick={() => setAdjustOpen(true)}
+          className="mt-4"
+          disabled={forecast.status === 'approved'}
+        >
+          <SlidersHorizontal className="h-4 w-4 mr-2" />
+          {adjustment ? 'Изменить корректировку' : 'Корректировать заявку (±)'}
+        </Button>
 
         {unmarked.length ? (
           <div className="mt-4 flex items-start gap-2.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
@@ -425,6 +547,16 @@ export default function SchoolForecastPage() {
         forecast={forecast}
         onSubmit={handleApprove}
         loading={approve.isPending}
+      />
+
+      <AdjustmentDialog
+        open={adjustOpen}
+        onOpenChange={setAdjustOpen}
+        adjustment={adjustment}
+        forecastDate={date}
+        totalPortions={forecast.totalPortions}
+        onSubmit={handleSetAdjustment}
+        loading={setAdjustment.isPending}
       />
     </>
   )

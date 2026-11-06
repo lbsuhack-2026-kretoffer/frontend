@@ -39,6 +39,12 @@ import { todayISO } from '@/shared/lib/date'
 import { formatNumber } from '@/shared/lib/format'
 import { AGE_GROUP_LABELS, AGE_GROUP_TONE, MEAL_STATUS_LABELS } from '@/shared/lib/labels'
 
+const SEARCH_MODES = [
+  { value: 'surname', label: 'Фамилия' },
+  { value: 'firstname', label: 'Имя' },
+  { value: 'middlename', label: 'Отчество' },
+]
+
 export default function ClassDetailPage() {
   const { classId } = useParams()
   const navigate = useNavigate()
@@ -55,6 +61,7 @@ export default function ClassDetailPage() {
   const { toast } = useToast()
 
   const [query, setQuery] = useState('')
+  const [searchMode, setSearchMode] = useState('surname')
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [studentToDelete, setStudentToDelete] = useState(null)
@@ -64,8 +71,15 @@ export default function ClassDetailPage() {
     const items = studentsQuery.data || []
     const search = query.trim().toLowerCase()
     if (!search) return items
-    return items.filter((student) => student.fullName.toLowerCase().includes(search))
-  }, [studentsQuery.data, query])
+    return items.filter((student) => {
+      const parts = student.fullName.toLowerCase().split(/\s+/)
+      const surname = parts[0] || ''
+      const firstName = parts[1] || ''
+      const middleName = parts[2] || ''
+      const field = searchMode === 'firstname' ? firstName : searchMode === 'middlename' ? middleName : surname
+      return field.startsWith(search)
+    })
+  }, [studentsQuery.data, query, searchMode])
 
   if (classQuery.isLoading) return <PageSkeleton />
   if (classQuery.isError) {
@@ -192,10 +206,23 @@ export default function ClassDetailPage() {
               <CardTitle>Ученики</CardTitle>
               <p className="mt-1 text-xs text-muted">Постоянные отказники не попадают в расчёт порций</p>
             </div>
-            <Button size="sm" onClick={() => setAddOpen(true)}>
-              <Plus className="h-3.5 w-3.5" />
-              Добавить
-            </Button>
+            <div className="flex items-center gap-2">
+              <Select
+                value={searchMode}
+                onChange={(event) => setSearchMode(event.target.value)}
+                className="w-[100px]"
+              >
+                {SEARCH_MODES.map((mode) => (
+                  <option key={mode.value} value={mode.value}>
+                    {mode.label}
+                  </option>
+                ))}
+              </Select>
+              <Button size="sm" onClick={() => setAddOpen(true)}>
+                <Plus className="h-3.5 w-3.5" />
+                Добавить
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="pt-1">
             <div className="relative mb-3">
@@ -203,7 +230,7 @@ export default function ClassDetailPage() {
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Поиск ученика"
+                placeholder="Первые буквы"
                 className="pl-9"
               />
             </div>
@@ -240,8 +267,15 @@ export default function ClassDetailPage() {
                             onCheckedChange={(checked) => toggleMealStatus(student, checked)}
                             aria-label={`Питание ${student.fullName}`}
                           />
-                          <span className="text-xs text-muted">
-                            {student.mealStatus === 'regular' ? 'Да' : 'Нет'}
+                          <span
+                            className={cn(
+                              'text-xs font-medium',
+                              student.mealStatus === 'regular'
+                                ? 'text-emerald-700'
+                                : 'text-amber-700',
+                            )}
+                          >
+                            {student.mealStatus === 'regular' ? 'Обедает' : 'Не обедает'}
                           </span>
                         </div>
                       </TD>

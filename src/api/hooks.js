@@ -8,18 +8,10 @@ function useRefresh() {
   return () => queryClient.invalidateQueries()
 }
 
-export function useDemoUsers() {
-  return useQuery({
-    queryKey: qk.demoUsers,
-    queryFn: () => api.get('/auth/demo-users'),
-    staleTime: 60_000,
-  })
-}
-
 export function useLogin() {
   const setUser = useSession((state) => state.setUser)
   return useMutation({
-    mutationFn: (userId) => api.post('/auth/login', { userId }),
+    mutationFn: (credentials) => api.post('/auth/login', credentials),
     onSuccess: (user) => setUser(user),
   })
 }
@@ -62,10 +54,10 @@ export function useSchoolTeachers(schoolId) {
   })
 }
 
-export function useSchoolStudents(schoolId, query) {
+export function useSchoolStudents(schoolId, query, searchBy = 'surname') {
   return useQuery({
-    queryKey: qk.schoolStudents(schoolId, query),
-    queryFn: () => api.get(`/schools/${schoolId}/students`, { query: { query } }),
+    queryKey: qk.schoolStudents(schoolId, query, searchBy),
+    queryFn: () => api.get(`/schools/${schoolId}/students`, { query: { query, searchBy } }),
     enabled: Boolean(schoolId),
   })
 }
@@ -286,6 +278,32 @@ export function useApproveForecast() {
   return useMutation({
     mutationFn: ({ schoolId, date, comment }) =>
       api.post(`/schools/${schoolId}/forecast/${date}/approve`, { comment }),
+    onSuccess: refresh,
+  })
+}
+
+export function useForecastAdjustments(schoolId) {
+  return useQuery({
+    queryKey: qk.forecastAdjustments(schoolId),
+    queryFn: () => api.get(`/schools/${schoolId}/forecast/adjustments`),
+    enabled: Boolean(schoolId),
+  })
+}
+
+export function useSetForecastAdjustment() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: ({ schoolId, date, delta, reason }) =>
+      api.post(`/schools/${schoolId}/forecast/${date}/adjust`, { delta, reason }),
+    onSuccess: refresh,
+  })
+}
+
+export function useRemoveForecastAdjustment() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: ({ schoolId, date }) =>
+      api.delete(`/schools/${schoolId}/forecast/${date}/adjust`),
     onSuccess: refresh,
   })
 }

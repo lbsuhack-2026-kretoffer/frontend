@@ -1,4 +1,3 @@
-import { getSessionUser } from '@/features/auth/session'
 import { config } from '@/shared/config'
 
 export class ApiError extends Error {
@@ -38,7 +37,6 @@ async function parseBody(response) {
 
 export async function request(path, options = {}) {
   const { method = 'GET', body, query, headers, signal } = options
-  const user = getSessionUser()
 
   const response = await fetch(buildUrl(path, query), {
     method,
@@ -47,7 +45,7 @@ export async function request(path, options = {}) {
     headers: {
       Accept: 'application/json',
       ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
-      ...(user?.id && config.authMode === 'mock' ? { 'X-Demo-User': user.id } : {}),
+
       ...headers,
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),

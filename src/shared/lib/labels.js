@@ -56,3 +56,9 @@ export const ACCESS_TYPE_LABELS = {
   entry: 'Вход',
   exit: 'Выход',
 }
+
+export function ageGroupForGrade(grade) {
+  if (grade <= 4) return 'junior'
+  if (grade <= 9) return 'middle'
+  return 'senior'
+}

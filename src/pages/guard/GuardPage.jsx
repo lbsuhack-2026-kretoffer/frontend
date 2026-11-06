@@ -23,7 +23,7 @@ import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { EmptyState, ErrorState } from '@/shared/ui/empty-state'
-import { Input } from '@/shared/ui/input'
+import { Input, Select } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
 import { PageSkeleton } from '@/shared/ui/skeleton'
 import { StatCard } from '@/shared/ui/stat-card'
@@ -32,6 +32,12 @@ import { cn } from '@/shared/lib/cn'
 import { formatDate, todayISO } from '@/shared/lib/date'
 import { formatNumber } from '@/shared/lib/format'
 import { ACCESS_SOURCE_LABELS, ACCESS_TYPE_LABELS } from '@/shared/lib/labels'
+
+const SEARCH_MODES = [
+  { value: 'surname', label: 'Фамилия' },
+  { value: 'firstname', label: 'Имя' },
+  { value: 'middlename', label: 'Отчество' },
+]
 
 export default function GuardPage() {
   const user = useSession((state) => state.user)
@@ -44,13 +50,14 @@ export default function GuardPage() {
   const { toast } = useToast()
 
   const [query, setQuery] = useState('')
+  const [searchMode, setSearchMode] = useState('surname')
   const [selected, setSelected] = useState(null)
   const [type, setType] = useState('entry')
 
-  const studentsQuery = useSchoolStudents(schoolId, query.trim())
+  const studentsQuery = useSchoolStudents(schoolId, query.trim(), searchMode)
 
   const results = useMemo(() => {
-    if (query.trim().length < 2) return []
+    if (query.trim().length < 1) return []
     return (studentsQuery.data || []).slice(0, 8)
   }, [query, studentsQuery.data])
 
@@ -104,8 +111,8 @@ export default function GuardPage() {
         title="Отметка входа"
         description={`${school.name} · ${formatDate(today, 'd MMMM, EEEE')}. Найдите ученика по фамилии и отметьте проход вручную, если турникет не сработал.`}
         actions={
-          <Badge tone="info" dot>
-            Демо СКУД
+          <Badge tone="neutral" dot>
+            СКУД
           </Badge>
         }
       />
@@ -122,8 +129,24 @@ export default function GuardPage() {
           <CardHeader>
             <div>
               <CardTitle>Найти ученика</CardTitle>
-              <p className="mt-1 text-xs text-muted">Введите минимум 2 символа фамилии</p>
+              <p className="mt-1 text-xs text-muted">
+                Поиск по первым буквам выбранного поля
+              </p>
             </div>
+              <Select
+              value={searchMode}
+              onChange={(event) => {
+                setSearchMode(event.target.value)
+                setSelected(null)
+              }}
+              className="w-[100px]"
+            >
+              {SEARCH_MODES.map((mode) => (
+                <option key={mode.value} value={mode.value}>
+                  {mode.label}
+                </option>
+              ))}
+            </Select>
           </CardHeader>
           <CardContent className="pt-2">
             <div className="relative">
@@ -134,7 +157,7 @@ export default function GuardPage() {
                   setQuery(event.target.value)
                   setSelected(null)
                 }}
-                placeholder="Например: Соколов"
+                placeholder="Первые буквы"
                 className="pl-9"
                 autoFocus
               />
@@ -154,11 +177,11 @@ export default function GuardPage() {
             </div>
 
             <div className="mt-3">
-              {query.trim().length < 2 ? (
+              {query.trim().length < 1 ? (
                 <div className="rounded-xl border border-dashed border-line px-4 py-8 text-center">
                   <UserRound className="mx-auto h-8 w-8 text-faint" />
                   <p className="mt-2 text-xs text-muted">
-                    Начните вводить фамилию — покажем учеников школы.
+                    Введите первые буквы — покажем учеников школы.
                   </p>
                 </div>
               ) : studentsQuery.isLoading ? (

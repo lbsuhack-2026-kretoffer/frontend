@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   Clock,
   ClipboardCheck,
-  Info,
   UserX,
   Users,
 } from 'lucide-react'
@@ -251,13 +250,6 @@ export default function TeacherHomePage() {
               </p>
             </CardContent>
           </Card>
-
-          <div className="flex items-start gap-2.5 rounded-2xl border border-line bg-elevated/70 p-3.5">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
-            <p className="text-[11px] text-muted">
-              Демо-режим: данные хранятся в браузере и сбрасываются при обновлении демо-стенда.
-            </p>
-          </div>
         </div>
       </div>
     </>

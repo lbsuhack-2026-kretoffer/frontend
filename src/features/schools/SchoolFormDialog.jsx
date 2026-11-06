@@ -12,7 +12,13 @@ const baseSchema = z.object({
   name: z.string().min(2, 'Укажите название школы'),
   city: z.string().min(2, 'Укажите город'),
   address: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || /^\+?\d[\d\s-()]{6,}$/.test(val),
+      'Некорректный номер телефона',
+    ),
   email: z.union([z.string().email('Некорректный e-mail'), z.literal('')]).optional(),
   mealPlan: z.enum(['fixed', 'canteen']),
   timezone: z.string().min(1),
@@ -23,6 +29,15 @@ const baseSchema = z.object({
 const createSchema = baseSchema.extend({
   adminFullName: z.string().optional(),
   adminEmail: z.union([z.string().email('Некорректный e-mail'), z.literal('')]).optional(),
+  adminPassword: z.string().min(6, 'Пароль не менее 6 символов').optional(),
+  adminPasswordConfirm: z.string().optional(),
+}).refine((data) => {
+  if (!data.adminPassword && !data.adminPasswordConfirm) return true
+  if (data.adminPassword !== data.adminPasswordConfirm) return false
+  return true
+}, {
+  message: 'Пароли не совпадают',
+  path: ['adminPasswordConfirm'],
 })
 
 const defaultCreate = {
@@ -37,6 +52,8 @@ const defaultCreate = {
   attendanceDeadline: '09:30',
   adminFullName: '',
   adminEmail: '',
+  adminPassword: '',
+  adminPasswordConfirm: '',
 }
 
 function SchoolFields({ register, errors, includeAdmin = false }) {
@@ -81,8 +98,14 @@ function SchoolFields({ register, errors, includeAdmin = false }) {
           <Field label="ФИО завуча" error={errors.adminFullName?.message}>
             <Input placeholder="Иван Петров" {...register('adminFullName')} />
           </Field>
-          <Field label="E-mail завуча" error={errors.adminEmail?.message} hint="Приглашение и доступ к школе">
+          <Field label="Логин завуча (e-mail)" error={errors.adminEmail?.message} hint="Будет использоваться для входа в систему">
             <Input placeholder="zavuch@school.by" {...register('adminEmail')} />
+          </Field>
+          <Field label="Пароль завуча" type="password" error={errors.adminPassword?.message}>
+            <Input placeholder="••••••••" {...register('adminPassword')} />
+          </Field>
+          <Field label="Повторите пароль" type="password" error={errors.adminPasswordConfirm?.message}>
+            <Input placeholder="••••••••" {...register('adminPasswordConfirm')} />
           </Field>
         </>
       ) : null}
@@ -111,6 +134,7 @@ export function SchoolCreateDialog({ open, onOpenChange }) {
         bufferPercent: Number(values.bufferPercent),
         adminEmail: values.adminEmail || undefined,
         adminFullName: values.adminFullName || undefined,
+        adminPassword: values.adminPassword || undefined,
       })
       toast({ title: 'Школа добавлена', description: school.name, variant: 'success' })
       onOpenChange(false)

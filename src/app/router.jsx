@@ -2,7 +2,6 @@ import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import AppShell from '@/app/AppShell'
 import { HomeRedirect, ProtectedRoute, RoleRoute } from '@/app/guards'
-import AuthCallbackPage from '@/pages/auth/AuthCallbackPage'
 import LoginPage from '@/pages/auth/LoginPage'
 import ForbiddenPage from '@/pages/ForbiddenPage'
 import NotFoundPage from '@/pages/NotFoundPage'
@@ -34,7 +33,6 @@ export default function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/403" element={<ForbiddenPage />} />
 
       <Route element={<ProtectedRoute />}>

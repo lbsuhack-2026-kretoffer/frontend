@@ -18,13 +18,19 @@ import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { EmptyState, ErrorState } from '@/shared/ui/empty-state'
-import { Input } from '@/shared/ui/input'
+import { Input, Select } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
 import { PageSkeleton } from '@/shared/ui/skeleton'
 import { useToast } from '@/shared/ui/use-toast'
 import { formatDate, relativeDayLabel, todayISO } from '@/shared/lib/date'
 import { formatNumber, studentsLabel } from '@/shared/lib/format'
 import { cn } from '@/shared/lib/cn'
+
+const SEARCH_MODES = [
+  { value: 'surname', label: 'Фамилия' },
+  { value: 'firstname', label: 'Имя' },
+  { value: 'middlename', label: 'Отчество' },
+]
 
 function setsEqual(a, b) {
   if (a.size !== b.size) return false
@@ -41,6 +47,7 @@ export default function AttendancePage() {
 
   const [draft, setDraft] = useState(null)
   const [search, setSearch] = useState('')
+  const [searchMode, setSearchMode] = useState('surname')
 
   const savedAbsent = useMemo(
     () => new Set(query.data?.absentStudentIds || []),
@@ -61,8 +68,15 @@ export default function AttendancePage() {
     const items = query.data?.students || []
     const term = search.trim().toLowerCase()
     if (!term) return items
-    return items.filter((student) => student.fullName.toLowerCase().includes(term))
-  }, [query.data?.students, search])
+    return items.filter((student) => {
+      const parts = student.fullName.toLowerCase().split(/\s+/)
+      const surname = parts[0] || ''
+      const firstName = parts[1] || ''
+      const middleName = parts[2] || ''
+      const field = searchMode === 'firstname' ? firstName : searchMode === 'middlename' ? middleName : surname
+      return field.startsWith(term)
+    })
+  }, [query.data?.students, search, searchMode])
 
   const stats = useMemo(() => {
     const items = query.data?.students || []
@@ -188,6 +202,17 @@ export default function AttendancePage() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-1.5">
+                <Select
+                  value={searchMode}
+                  onChange={(event) => setSearchMode(event.target.value)}
+                  className="w-[100px]"
+                >
+                  {SEARCH_MODES.map((mode) => (
+                    <option key={mode.value} value={mode.value}>
+                      {mode.label}
+                    </option>
+                  ))}
+                </Select>
                 <Button size="sm" variant="outline" onClick={markAllPresent} disabled={!marked && !absent.size}>
                   <CheckCheck className="h-3.5 w-3.5" />
                   Все на месте
@@ -204,7 +229,7 @@ export default function AttendancePage() {
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Найти ученика по фамилии"
+                  placeholder="Первые буквы"
                   className="pl-9"
                 />
               </div>
