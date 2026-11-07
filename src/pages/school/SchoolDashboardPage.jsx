@@ -85,7 +85,7 @@ export default function SchoolDashboardPage() {
       <PageHeader
         eyebrow={school.name}
         title="Дашборд школы"
-        description={`${formatDate(today, 'd MMMM, EEEE')} · заявка на ${relativeDayLabel(tomorrow)}, ${formatDate(tomorrow, 'd MMMM')}`}
+        description={`${school.district ? school.district + ' · ' : ''}${formatDate(today, 'd MMMM, EEEE')} · заявка на ${relativeDayLabel(tomorrow)}, ${formatDate(tomorrow, 'd MMMM')}`}
         actions={
           <>
             <Link to="/school/forecast" className={buttonStyles({ variant: 'primary', size: 'md' })}>

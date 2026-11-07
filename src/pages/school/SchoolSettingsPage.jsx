@@ -20,6 +20,7 @@ import { MEAL_PLAN_LABELS } from '@/shared/lib/labels'
 const schema = z.object({
   name: z.string().min(2, 'Укажите название'),
   city: z.string().min(2, 'Укажите город'),
+  district: z.string().min(1, 'Укажите район'),
   address: z.string().optional(),
   phone: z.string().optional(),
   email: z.union([z.string().email('Некорректный e-mail'), z.literal('')]).optional(),
@@ -49,6 +50,7 @@ export default function SchoolSettingsPage() {
     reset({
       name: school.name,
       city: school.city,
+      district: school.district || '',
       address: school.address || '',
       phone: school.phone || '',
       email: school.email || '',
@@ -123,6 +125,9 @@ export default function SchoolSettingsPage() {
               </Field>
               <Field label="Город" error={errors.city?.message}>
                 <Input {...register('city')} />
+              </Field>
+              <Field label="Район" error={errors.district?.message}>
+                <Input {...register('district')} />
               </Field>
               <Field label="Адрес" error={errors.address?.message}>
                 <Input {...register('address')} />
