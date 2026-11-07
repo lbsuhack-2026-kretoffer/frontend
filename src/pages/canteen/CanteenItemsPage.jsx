@@ -233,6 +233,18 @@ export default function CanteenItemsPage() {
     )
   }
 
+  if (!schoolId) {
+    return (
+      <div className="mt-6 flex items-center justify-center">
+        <EmptyState
+          icon={Utensils}
+          title="Школа не привязана"
+          description="Ваш аккаунт сотрудника КШП не привязан к школе. Обратитесь к администратору платформы."
+        />
+      </div>
+    )
+  }
+
   const chartData = aggregates.map((category) => ({ name: category.name, qty: category.qty }))
 
   return (

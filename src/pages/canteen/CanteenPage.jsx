@@ -6,6 +6,7 @@ import {
   Download,
   Info,
   Printer,
+  School,
   TrendingUp,
   Utensils,
 } from 'lucide-react'
@@ -112,6 +113,19 @@ export default function CanteenPage() {
   }
 
   const school = schoolQuery.data
+
+  if (!school) {
+    return (
+      <div className="mt-6 flex items-center justify-center">
+        <EmptyState
+          icon={School}
+          title="Школа не привязана"
+          description="Ваш аккаунт сотрудника КШП не привязан к школе. Обратитесь к администратору платформы."
+        />
+      </div>
+    )
+  }
+
   const approved = forecast.status === 'approved'
 
   const handleApprove = async (comment) => {
