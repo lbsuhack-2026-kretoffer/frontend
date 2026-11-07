@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Utensils, Plus, Menu, Link, Unlink } from 'lucide-react'
-import { useCreateKitchen, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
+import { Factory, Utensils, Plus, Menu, Link, Unlink, Trash2 } from 'lucide-react'
+import { useCreateKitchen, useCreateMenuItem, useDeleteKitchen, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
-import { Dialog } from '@/shared/ui/dialog'
+import { ConfirmDialog, Dialog } from '@/shared/ui/dialog'
 import { EmptyState } from '@/shared/ui/empty-state'
 import { Field, Input } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
@@ -23,7 +23,11 @@ export default function KitchenPage() {
 
   const createMenuItem = useCreateMenuItem()
   const createKitchen = useCreateKitchen()
+  const deleteKitchen = useDeleteKitchen()
   const setSchoolKitchen = useSetSchoolKitchen()
+
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [kitchenToDelete, setKitchenToDelete] = useState(null)
 
   const loadKitchens = useCallback(async () => {
     setLoadingKitchens(true)
@@ -103,14 +107,21 @@ export default function KitchenPage() {
     const form = new FormData(event.target)
     const name = form.get('name')
     const district = form.get('district')
+    const email = form.get('email')
+    const password = form.get('password')
 
-    if (!name || !district) {
+    if (!name || !district || !email || !password) {
       toast({ title: 'Заполните все поля', variant: 'error' })
       return
     }
 
     try {
-      await createKitchen.mutateAsync({ name: String(name), district: String(district) })
+      await createKitchen.mutateAsync({
+        name: String(name),
+        district: String(district),
+        email: String(email),
+        password: String(password),
+      })
       toast({ title: 'КШП создано', variant: 'success' })
       event.target.reset()
       setCreateKitchenOpen(false)
@@ -136,6 +147,22 @@ export default function KitchenPage() {
       toast({ title: 'Школа отвязана от КШП', variant: 'success' })
     } catch (error) {
       toast({ title: 'Не удалось отвязать школу', description: error.message, variant: 'error' })
+    }
+  }
+
+  const handleDeleteKitchen = async () => {
+    if (!kitchenToDelete) return
+    try {
+      await deleteKitchen.mutateAsync(kitchenToDelete.id)
+      toast({ title: 'КШП удалено', variant: 'success' })
+      setDeleteOpen(false)
+      setKitchenToDelete(null)
+      await loadKitchens()
+      if (selectedKitchenId === kitchenToDelete.id) {
+        setSelectedKitchenId(null)
+      }
+    } catch (error) {
+      toast({ title: 'Не удалось удалить КШП', description: error.message, variant: 'error' })
     }
   }
 
@@ -177,22 +204,42 @@ export default function KitchenPage() {
               ) : (
                 <div className="space-y-2">
                   {kitchens.map((kitchen) => (
-                    <Button
+                    <div
                       key={kitchen.id}
+                      className="flex items-center gap-2"
                       onClick={() => setSelectedKitchenId(kitchen.id)}
-                      className={`
-                        w-full flex items-center gap-3 p-3 rounded-lg border transition-colors
-                        ${selectedKitchenId === kitchen.id
-                          ? 'bg-brand-50 border-brand-200 text-brand-800'
-                          : 'bg-surface border-line hover:bg-elevated'}
-                      `}
                     >
-                      <Factory className="h-4 w-4" />
-                      <div>
-                        <div className="font-medium text-strong">{kitchen.name}</div>
-                        <div className="text-[11px] text-muted">{kitchen.district}</div>
-                      </div>
-                    </Button>
+                      <Button
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setSelectedKitchenId(kitchen.id)
+                        }}
+                        className={`
+                          flex-1 flex items-center gap-3 p-3 rounded-lg border transition-colors
+                          ${selectedKitchenId === kitchen.id
+                            ? 'bg-brand-50 border-brand-200 text-brand-800'
+                            : 'bg-surface border-line hover:bg-elevated'}
+                        `}
+                      >
+                        <Factory className="h-4 w-4" />
+                        <div>
+                          <div className="font-medium text-strong">{kitchen.name}</div>
+                          <div className="text-[11px] text-muted">{kitchen.district}</div>
+                        </div>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setKitchenToDelete(kitchen)
+                          setDeleteOpen(true)
+                        }}
+                        aria-label="Удалить КШП"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                      </Button>
+                    </div>
                   ))}
                 </div>
               )}
@@ -272,9 +319,14 @@ export default function KitchenPage() {
                 <CardContent className="pt-2">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-strong">Меню на день</h2>
-                    <Button onClick={() => setCreateOpen(true)}>
-                      <Plus className="h-4 w-4" /> Добавить блюдо
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button onClick={() => setCreateOpen(true)}>
+                        <Plus className="h-4 w-4" /> Добавить блюдо
+                      </Button>
+                      <Button variant="outline" onClick={() => setSelectedKitchenId(null)}>
+                        Закрыть
+                      </Button>
+                    </div>
                   </div>
                   {loadingMenu ? (
                     <div className="h-64 animate-pulse rounded-xl bg-elevated" />
@@ -350,6 +402,12 @@ export default function KitchenPage() {
           <Field label="Район">
             <Input name="district" placeholder="Центральный район" />
           </Field>
+          <Field label="Логин общего аккаунта КШП (e-mail)" className="sm:col-span-2">
+            <Input type="email" name="email" placeholder="kitchen@school.by" />
+          </Field>
+          <Field label="Пароль общего аккаунта КШП" className="sm:col-span-2">
+            <Input type="password" name="password" placeholder="••••••••" />
+          </Field>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setCreateKitchenOpen(false)}>
               Отмена
@@ -359,6 +417,19 @@ export default function KitchenPage() {
         </form>
       </Dialog>
 
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={(open) => !open && setDeleteOpen(false)}
+        title="Удалить КШП?"
+        description={
+          kitchenToDelete
+            ? `Комбинат питания «${kitchenToDelete.name}» и все привязанные к нему школы будут удалены.`
+            : ''
+        }
+        confirmLabel="Удалить"
+        loading={deleteKitchen.isPending}
+        onConfirm={handleDeleteKitchen}
+      />
       <Dialog
         open={attachOpen}
         onOpenChange={setAttachOpen}
