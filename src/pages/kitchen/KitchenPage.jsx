@@ -1,14 +1,32 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Utensils, Plus, Menu, Link, Unlink, Trash2 } from 'lucide-react'
-import { useCreateKitchen, useCreateMenuItem, useDeleteKitchen, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
+import {
+  Factory,
+  Utensils,
+  Plus,
+  Menu,
+  Link,
+  Unlink,
+  Trash2,
+  ChevronRight,
+  Clock,
+  ShieldCheck,
+} from 'lucide-react'
+import {
+  useCreateKitchen,
+  useCreateMenuItem,
+  useDeleteKitchen,
+  useDeleteMenuItem,
+  useKitchenSchools,
+  useSetSchoolKitchen,
+} from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { ConfirmDialog, Dialog } from '@/shared/ui/dialog'
 import { EmptyState } from '@/shared/ui/empty-state'
 import { Field, Input } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
 import { useToast } from '@/shared/ui/use-toast'
+import { formatMoney } from '@/shared/lib/format'
 
 export default function KitchenPage() {
   const { toast } = useToast()
@@ -22,12 +40,15 @@ export default function KitchenPage() {
   const [loadingMenu, setLoadingMenu] = useState(false)
 
   const createMenuItem = useCreateMenuItem()
+  const deleteMenuItem = useDeleteMenuItem()
   const createKitchen = useCreateKitchen()
   const deleteKitchen = useDeleteKitchen()
   const setSchoolKitchen = useSetSchoolKitchen()
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [kitchenToDelete, setKitchenToDelete] = useState(null)
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const [itemDeleteOpen, setItemDeleteOpen] = useState(false)
 
   const loadKitchens = useCallback(async () => {
     setLoadingKitchens(true)
@@ -102,6 +123,19 @@ export default function KitchenPage() {
     }
   }
 
+  const handleDeleteMenuItem = async () => {
+    if (!itemToDelete || !selectedKitchenId) return
+    try {
+      await deleteMenuItem.mutateAsync({ kitchenId: selectedKitchenId, itemId: itemToDelete.id })
+      toast({ title: 'Блюдо удалено из меню', variant: 'success' })
+      setItemDeleteOpen(false)
+      setItemToDelete(null)
+      await loadMenu(selectedKitchenId)
+    } catch (error) {
+      toast({ title: 'Не удалось удалить блюдо', description: error.message, variant: 'error' })
+    }
+  }
+
   const submitKitchen = async (event) => {
     event.preventDefault()
     const form = new FormData(event.target)
@@ -172,16 +206,42 @@ export default function KitchenPage() {
     return <div className="flex h-screen items-center justify-center">Загрузка КШП...</div>
   }
 
+  // Если КШП не выбран — показываем пустое состояние
+  if (!selectedKitchen) {
+    return (
+      <>
+        <PageHeader
+          eyebrow="Кабинет КШП"
+          title="Управление меню комбината питания"
+          description="Выберите комбинат питания для управления меню и школами"
+          actions={
+            <Button onClick={() => setCreateKitchenOpen(true)}>
+              <Plus className="h-4 w-4" /> Создать КШП
+            </Button>
+          }
+        />
+        <div className="mt-6 flex items-center justify-center">
+          <EmptyState
+            icon={Factory}
+            title="КШП не выбраны"
+            description="Выберите комбинат питания слева или создайте первый"
+            action={
+              <Button onClick={() => setCreateKitchenOpen(true)}>
+                <Plus className="h-4 w-4" /> Создать КШП
+              </Button>
+            }
+          />
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <PageHeader
         eyebrow="Кабинет КШП"
         title="Управление меню комбината питания"
-        description={
-          selectedKitchen
-            ? `КШП «${selectedKitchen.name}» · район ${selectedKitchen.district}`
-            : 'Выберите комбинат питания для управления меню'
-        }
+        description={`КШП «${selectedKitchen.name}» · район ${selectedKitchen.district}`}
         actions={
           <Button onClick={() => setCreateKitchenOpen(true)}>
             <Plus className="h-4 w-4" /> Создать КШП
@@ -189,7 +249,7 @@ export default function KitchenPage() {
         }
       />
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-12">
+      <div className="mt-6 grid gap-6 lg:grid-cols-12">
         {/* Выбор КШП */}
         <div className="lg:col-span-4">
           <Card className="overflow-hidden">
@@ -251,121 +311,140 @@ export default function KitchenPage() {
 
         {/* Детали КШП */}
         <div className="lg:col-span-8">
-          {!selectedKitchen ? (
-            <EmptyState
-              icon={Menu}
-              title="Выберите КШП"
-              description="Выберите комбинат питания слева, чтобы управлять его меню и школами"
-            />
-          ) : (
-            <>
-              {/* Школы КШП */}
-              <Card className="overflow-hidden">
-                <CardHeader>
-                  <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  {!schoolsData ? (
-                    <div className="h-40 animate-pulse rounded-xl bg-elevated" />
-                  ) : schoolsData.length === 0 ? (
-                    <EmptyState
-                      icon={Link}
-                      title="Школ пока нет"
-                      description="Привяжите школы этого района к КШП"
-                      action={
-                        <Button onClick={() => setAttachOpen(true)}>
-                          <Link className="h-3.5 w-3.5" />
-                          Привязать первую школу
-                        </Button>
-                      }
-                    />
-                  ) : (
-                    <Table>
-                      <THead>
-                        <TR>
-                          <TH>Школа</TH>
-                          <TH>Город</TH>
-                          <TH>Учеников</TH>
-                          <TH className="text-right">Действия</TH>
-                        </TR>
-                      </THead>
-                      <TBody>
-                        {schoolsData.map((school) => (
-                          <TR key={school.id}>
-                            <TD className="font-medium text-strong">{school.name}</TD>
-                            <TD>{school.city}</TD>
-                            <TD>{school.studentsCount}</TD>
-                            <TD>
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                onClick={() => detachSchool(school.id)}
-                                aria-label="Отвязать школу"
-                              >
-                                <Unlink className="h-3.5 w-3.5 text-red-400" />
-                              </Button>
-                            </TD>
-                          </TR>
-                        ))}
-                      </TBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Меню выбранного КШП */}
-              <Card className="overflow-hidden mt-4">
-                <CardHeader>
-                  <CardTitle>{selectedKitchen.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-strong">Меню на день</h2>
-                    <div className="flex items-center gap-2">
-                      <Button onClick={() => setCreateOpen(true)}>
-                        <Plus className="h-4 w-4" /> Добавить блюдо
-                      </Button>
-                      <Button variant="outline" onClick={() => setSelectedKitchenId(null)}>
-                        Закрыть
+          {/* Школы КШП */}
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-2">
+              {!schoolsData ? (
+                <div className="h-40 animate-pulse rounded-xl bg-elevated" />
+              ) : schoolsData.length === 0 ? (
+                <EmptyState
+                  icon={Link}
+                  title="Школ пока нет"
+                  description="Привяжите школы этого района к КШП"
+                  action={
+                    <Button onClick={() => setAttachOpen(true)}>
+                      <Link className="h-3.5 w-3.5" />
+                      Привязать первую школу
+                    </Button>
+                  }
+                />
+              ) : (
+                <div className="space-y-2">
+                  {schoolsData.map((school) => (
+                    <div
+                      key={school.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-line bg-surface hover:bg-elevated transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 p-1.5 rounded-lg bg-blue-50 text-blue-600">
+                          <ShieldCheck className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-strong">{school.name}</div>
+                          <div className="text-[11px] text-muted">
+                            {school.city} · {school.studentsCount} учеников
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => detachSchool(school.id)}
+                        aria-label="Отвязать школу"
+                      >
+                        <Unlink className="h-3.5 w-3.5 text-red-400" />
                       </Button>
                     </div>
+                  ))}
+                </div>
+              )}
+              {schoolsData && schoolsData.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAttachOpen(true)}
+                  className="mt-3"
+                >
+                  <Link className="h-3.5 w-3.5 mr-1.5" />
+                  Привязать ещё школу
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Меню выбранного КШП */}
+          <Card className="overflow-hidden mt-4">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Меню на день</CardTitle>
+                  <p className="text-xs text-muted">
+                    Блюда комбината «{selectedKitchen.name}»
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button onClick={() => setCreateOpen(true)}>
+                    <Plus className="h-4 w-4" /> Добавить блюдо
+                  </Button>
+                  <Button variant="outline" onClick={() => setSelectedKitchenId(null)}>
+                    Закрыть
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {loadingMenu ? (
+                <div className="h-64 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <Clock className="h-6 w-6 animate-spin text-brand-500" />
+                    <p className="text-sm text-muted">Загрузка меню...</p>
                   </div>
-                  {loadingMenu ? (
-                    <div className="h-64 animate-pulse rounded-xl bg-elevated" />
-                  ) : menuItems.length === 0 ? (
-                    <EmptyState
-                      icon={Utensils}
-                      title="Блюд пока нет"
-                      description="Добавьте первые блюда в меню этого КШП"
-                    />
-                  ) : (
-                    <Table>
-                      <THead>
-                        <TR>
-                          <TH>Блюдо</TH>
-                          <TH className="text-right">Цена, BYN</TH>
-                          <TH className="text-right">Действия</TH>
-                        </TR>
-                      </THead>
-                      <TBody>
-                        {menuItems.map((item) => (
-                          <TR key={item.id}>
-                            <TD className="font-medium text-strong">{item.name}</TD>
-                            <TD className="text-right font-mono">{item.price.toFixed(2)}</TD>
-                            <TD className="text-right">
-                              <Button variant="ghost" size="icon-sm">
-                                <Menu className="h-3.5 w-3.5" />
-                              </Button>
-                            </TD>
-                          </TR>
-                        ))}
-                      </TBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-            </>
-          )}
+                </div>
+              ) : menuItems.length === 0 ? (
+                <EmptyState
+                  icon={Utensils}
+                  title="Блюд пока нет"
+                  description="Добавьте первые блюда в меню этого КШП"
+                />
+              ) : (
+                <div className="space-y-2">
+                  {menuItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-line bg-white hover:bg-elevated transition-colors group"
+                    >
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="flex-shrink-0 p-1.5 rounded-lg bg-amber-50 text-amber-600">
+                          <Utensils className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-strong">{item.name}</div>
+                          <div className="text-[11px] text-muted">{formatMoney(item.price)}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setItemToDelete(item)
+                            setItemDeleteOpen(true)
+                          }}
+                          aria-label="Удалить блюдо"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
@@ -373,7 +452,7 @@ export default function KitchenPage() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         title="Добавить блюдо в меню"
-        description={`Блюдо будет добавлено в меню КШП «${selectedKitchen?.name}»`}
+        description={`Блюдо будет добавлено в меню КШП «${selectedKitchen.name}»`}
       >
         <form onSubmit={submitMenuItem} className="grid gap-3 p-4">
           <Field label="Название блюда">
@@ -435,11 +514,25 @@ export default function KitchenPage() {
         loading={deleteKitchen.isPending}
         onConfirm={handleDeleteKitchen}
       />
+
+      <ConfirmDialog
+        open={itemDeleteOpen}
+        onOpenChange={(open) => !open && setItemDeleteOpen(false)}
+        title="Удалить блюдо?"
+        description={
+          itemToDelete
+            ? `Блюдо «${itemToDelete.name}» будет удалено из меню.`
+            : ''
+        }
+        confirmLabel="Удалить"
+        loading={deleteMenuItem.isPending}
+        onConfirm={handleDeleteMenuItem}
+      />
       <Dialog
         open={attachOpen}
         onOpenChange={setAttachOpen}
         title="Привязать школу к КШП"
-        description={`Выберите школу для привязки к «${selectedKitchen?.name}»`}
+        description={`Выберите школу для привязки к «${selectedKitchen.name}»`}
       >
         <form onSubmit={(e) => {
           e.preventDefault()

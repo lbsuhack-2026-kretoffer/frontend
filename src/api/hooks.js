@@ -365,6 +365,15 @@ export function useDeleteKitchen() {
   })
 }
 
+export function useDeleteMenuItem() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: ({ kitchenId, itemId }) =>
+      api.delete(`/kitchen/kitchens/${kitchenId}/menu/${itemId}`),
+    onSuccess: refresh,
+  })
+}
+
 export function useCreateKitchenUser() {
   const refresh = useRefresh()
   return useMutation({
