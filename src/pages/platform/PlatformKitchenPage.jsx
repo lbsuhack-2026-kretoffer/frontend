@@ -80,7 +80,7 @@ function CreateKitchenDialog({ open, onOpenChange }) {
   )
 }
 
-function MenuItemDialog({ open, onOpenChange, kitchenId }) {
+function MenuItemDialog({ open, onOpenChange, kitchenId, onMenuItemAdded }) {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const { toast } = useToast()
@@ -101,6 +101,7 @@ function MenuItemDialog({ open, onOpenChange, kitchenId }) {
       toast({ title: 'Блюдо добавлено', variant: 'success' })
       setName('')
       setPrice('')
+      onMenuItemAdded?.()
       onOpenChange(false)
     } catch (error) {
       toast({ title: 'Не удалось добавить блюдо', description: error.message, variant: 'error' })
@@ -398,13 +399,15 @@ export default function PlatformKitchenPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Меню КШП: {selectedKitchen.name}</CardTitle>
-                    <Button onClick={() => setMenuOpen(true)}>
-                      <Plus className="h-3.5 w-3.5" />
-                      Добавить блюдо
-                    </Button>
-                    <Button variant="outline" onClick={() => setMenuOpen(false)}>
-                      Закрыть
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button onClick={() => setMenuOpen(true)}>
+                        <Plus className="h-3.5 w-3.5" />
+                        Добавить блюдо
+                      </Button>
+                      <Button variant="outline" onClick={() => setMenuOpen(false)}>
+                        Закрыть
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-2">
@@ -436,7 +439,12 @@ export default function PlatformKitchenPage() {
       </div>
 
       <CreateKitchenDialog open={createOpen} onOpenChange={setCreateOpen} />
-      <MenuItemDialog open={menuOpen} onOpenChange={setMenuOpen} kitchenId={selectedKitchen?.id} />
+      <MenuItemDialog
+        open={menuOpen}
+        onOpenChange={setMenuOpen}
+        kitchenId={selectedKitchen?.id}
+        onMenuItemAdded={() => selectedKitchen?.id && loadMenu(selectedKitchen.id)}
+      />
       <AttachSchoolDialog
         open={attachOpen}
         onOpenChange={setAttachOpen}
