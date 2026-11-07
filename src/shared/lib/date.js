@@ -49,6 +49,11 @@ export function isTomorrow(iso) {
   return iso === tomorrowISO()
 }
 
+export function formatTime(iso) {
+  if (!iso) return '—'
+  return format(parseISO(iso), 'HH:mm')
+}
+
 export function relativeDayLabel(iso) {
   const offset = offsetFromToday(iso)
   if (offset === 0) return 'сегодня'

@@ -3,18 +3,21 @@ import {
   Factory,
   Utensils,
   Plus,
-  Menu,
   Link,
   Unlink,
   Trash2,
   Clock,
-  ShieldCheck,
+  School,
 } from 'lucide-react'
+import { useSession } from '@/features/auth/session'
+import { useLocation } from 'react-router-dom'
 import {
   useCreateKitchen,
   useCreateMenuItem,
   useDeleteKitchen,
   useDeleteMenuItem,
+  useKitchenDistrictSchools,
+  useKitchenMenu,
   useKitchenSchools,
   useSetSchoolKitchen,
 } from '@/api/hooks'
@@ -26,17 +29,20 @@ import { Field, Input, Select } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
 import { useToast } from '@/shared/ui/use-toast'
 import { formatMoney } from '@/shared/lib/format'
+import { Badge } from '@/shared/ui/badge'
+import { MEAL_PLAN_LABELS } from '@/shared/lib/labels'
 
 export default function KitchenPage() {
   const { toast } = useToast()
+  const user = useSession((state) => state.user)
+  const location = useLocation()
+  const fixedMode = location.pathname === '/kitchen/fixed'
   const [kitchens, setKitchens] = useState([])
   const [selectedKitchenId, setSelectedKitchenId] = useState(null)
-  const [menuItems, setMenuItems] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [createKitchenOpen, setCreateKitchenOpen] = useState(false)
   const [attachOpen, setAttachOpen] = useState(false)
   const [loadingKitchens, setLoadingKitchens] = useState(false)
-  const [loadingMenu, setLoadingMenu] = useState(false)
 
   const createMenuItem = useCreateMenuItem()
   const deleteMenuItem = useDeleteMenuItem()
@@ -63,36 +69,33 @@ export default function KitchenPage() {
     }
   }, [toast])
 
-  const loadMenu = useCallback(async (kitchenId) => {
-    if (!kitchenId) return
-    setLoadingMenu(true)
-    try {
-      const res = await fetch(`/api/v1/kitchen/kitchens/${kitchenId}/menu`, {
-        credentials: 'include',
-        cache: 'no-store',
-      })
-      if (!res.ok) throw new Error(`Ошибка ${res.status}: не удалось загрузить меню`)
-      const data = await res.json()
-      setMenuItems(data || [])
-    } catch (error) {
-      toast({ title: 'Не удалось загрузить меню', description: error.message, variant: 'error' })
-    } finally {
-      setLoadingMenu(false)
-    }
-  }, [toast])
+  const { data: menuItems, isLoading: loadingMenu } = useKitchenMenu(selectedKitchenId)
 
-  const { data: schoolsData } = useKitchenSchools(selectedKitchenId)
+  // Определяем район для загрузки школ:
+  // для сотрудника КШП — его район, для админа — район выбранного КШП
+  const targetDistrict = user?.district || (selectedKitchen ? selectedKitchen.district : null)
+
+  const { data: districtSchools, isLoading: schoolsLoading } = useKitchenDistrictSchools(
+    targetDistrict,
+    fixedMode ? 'fixed' : null
+  )
+  const { data: kitchenSchoolsData } = useKitchenSchools(selectedKitchenId)
 
   useEffect(() => {
     loadKitchens()
   }, [loadKitchens])
 
-  // Автовыбор первого КШП после загрузки
+  // Автовыбор КШП: для сотрудника КШП — его район, для админа — первый в списке
   useEffect(() => {
     if (!selectedKitchenId && kitchens.length > 0) {
-      setSelectedKitchenId(kitchens[0].id)
+      if (user?.role === 'canteen' && user?.district) {
+        const kitchen = kitchens.find((k) => k.district === user.district)
+        if (kitchen) setSelectedKitchenId(kitchen.id)
+      } else {
+        setSelectedKitchenId(kitchens[0].id)
+      }
     }
-  }, [kitchens, selectedKitchenId])
+  }, [kitchens, selectedKitchenId, user?.role, user?.district])
 
   const selectedKitchen = kitchens.find((k) => k.id === selectedKitchenId)
 
@@ -116,7 +119,6 @@ export default function KitchenPage() {
       })
       toast({ title: 'Блюдо добавлено в меню', variant: 'success' })
       event.target.reset()
-      await loadMenu(selectedKitchenId)
     } catch (error) {
       toast({ title: 'Не удалось добавить блюдо', description: error.message, variant: 'error' })
     }
@@ -129,7 +131,6 @@ export default function KitchenPage() {
       toast({ title: 'Блюдо удалено из меню', variant: 'success' })
       setItemDeleteOpen(false)
       setItemToDelete(null)
-      await loadMenu(selectedKitchenId)
     } catch (error) {
       toast({ title: 'Не удалось удалить блюдо', description: error.message, variant: 'error' })
     }
@@ -212,13 +213,15 @@ export default function KitchenPage() {
         title="Управление меню комбината питания"
         description={
           selectedKitchen
-            ? `КШП «${selectedKitchen.name}» · район ${selectedKitchen.district}`
+            ? `район ${selectedKitchen.district}`
             : 'Выберите комбинат питания для управления меню и школами'
         }
         actions={
-          <Button onClick={() => setCreateKitchenOpen(true)}>
-            <Plus className="h-4 w-4" /> Создать КШП
-          </Button>
+          user?.role !== 'canteen' && (
+            <Button onClick={() => setCreateKitchenOpen(true)}>
+              <Plus className="h-4 w-4" /> Создать КШП
+            </Button>
+          )
         }
       />
 
@@ -241,8 +244,10 @@ export default function KitchenPage() {
       {/* Если выбран — показываем детали */}
       {selectedKitchen && (
         <div className="mt-6 grid gap-6 lg:grid-cols-12">
-          {/* Выбор КШП */}
-          <div className="lg:col-span-4">
+          {user?.role !== 'canteen' && (
+            <>
+              {/* Выбор КШП */}
+              <div className="lg:col-span-4">
             <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>КШП района</CardTitle>
@@ -298,68 +303,86 @@ export default function KitchenPage() {
                 )}
               </CardContent>
             </Card>
-          </div>
+              </div>
+            </>
+          )}
 
           {/* Детали КШП */}
           <div className="lg:col-span-8">
-            {/* Школы КШП */}
+            {/* Школы района с типом питания */}
             <Card className="overflow-hidden">
-              <CardHeader>
-                <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
+              <CardHeader className="flex items-center justify-between">
+                <CardTitle>
+                  {fixedMode
+                    ? 'Фиксированное питание'
+                    : selectedKitchen
+                      ? `Школы района ${selectedKitchen.district}`
+                      : 'Школы района'}
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-2">
-                {!schoolsData ? (
+                {selectedKitchenId && schoolsLoading ? (
                   <div className="h-40 animate-pulse rounded-xl bg-elevated" />
-                ) : schoolsData.length === 0 ? (
-                  <EmptyState
-                    icon={Link}
-                    title="Школ пока нет"
-                    description="Привяжите школы этого района к КШП"
-                    action={
-                      <Button onClick={() => setAttachOpen(true)}>
-                        <Link className="h-3.5 w-3.5" />
-                        Привязать первую школу
-                      </Button>
-                    }
-                  />
+                ) : selectedKitchenId && !districtSchools ? (
+                  <div className="h-40 flex items-center justify-center text-sm text-muted">
+                    Школ в районе не найдено
+                  </div>
                 ) : (
                   <div className="space-y-2">
-                    {schoolsData.map((school) => (
-                      <div
-                        key={school.id}
-                        className="flex items-center justify-between p-3 rounded-lg border border-line bg-surface hover:bg-elevated transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 p-1.5 rounded-lg bg-blue-50 text-blue-600">
-                            <ShieldCheck className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-strong">{school.name}</div>
-                            <div className="text-[11px] text-muted">
-                              {school.city} · {school.studentsCount} учеников
+                    {districtSchools.map((school) => {
+                      const isAttached = kitchenSchoolsData?.some((s) => s.id === school.id)
+                      const isCanteen = school.mealPlan === 'canteen'
+                      return (
+                        <div
+                          key={school.id}
+                          className="flex items-center justify-between p-3 rounded-lg border border-line bg-surface hover:bg-elevated transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0 p-1.5 rounded-lg bg-blue-50 text-blue-600">
+                              <School className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-strong">{school.name}</div>
+                              <div className="text-[11px] text-muted">
+                                {school.city} · {school.studentsCount} учеников
+                              </div>
                             </div>
                           </div>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              tone={isCanteen ? 'brand' : 'neutral'}
+                            >
+                              {MEAL_PLAN_LABELS[school.mealPlan]}
+                            </Badge>
+                            {isAttached ? (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => detachSchool(school.id)}
+                                aria-label="Отвязать школу"
+                              >
+                                <Unlink className="h-3.5 w-3.5 text-red-400" />
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="icon-sm"
+                                onClick={() => attachSchool(school.id)}
+                                aria-label="Привязать школу"
+                              >
+                                <Link className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => detachSchool(school.id)}
-                          aria-label="Отвязать школу"
-                        >
-                          <Unlink className="h-3.5 w-3.5 text-red-400" />
-                        </Button>
-                      </div>
-                    ))}
-                    {schoolsData.length > 0 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setAttachOpen(true)}
-                        className="mt-3"
-                      >
-                        <Link className="h-3.5 w-3.5 mr-1.5" />
-                        Привязать ещё школу
-                      </Button>
+                      )
+                    })}
+                    {districtSchools.length === 0 && (
+                      <EmptyState
+                        icon={School}
+                        title="Школ в районе не найдено"
+                        description="В этом районе нет школ"
+                      />
                     )}
                   </div>
                 )}
@@ -367,25 +390,20 @@ export default function KitchenPage() {
             </Card>
 
             {/* Меню выбранного КШП */}
-            <Card className="overflow-hidden mt-4">
+            <Card className="overflow-hidden mt-4 relative">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Меню на день</CardTitle>
-                    <p className="text-xs text-muted">
-                      Блюда комбината «{selectedKitchen.name}»
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button onClick={() => setCreateOpen(true)}>
-                      <Plus className="h-4 w-4" /> Добавить блюдо
-                    </Button>
-                    <Button variant="outline" onClick={() => setSelectedKitchenId(null)}>
-                      Закрыть
-                    </Button>
-                  </div>
+                <div>
+                  <CardTitle>Меню на день</CardTitle>
+                  <p className="text-xs text-muted">
+                    Блюда комбината «{selectedKitchen.name}»
+                  </p>
                 </div>
               </CardHeader>
+              <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <Button onClick={() => setCreateOpen(true)}>
+                  <Plus className="h-4 w-4" /> Добавить блюдо
+                </Button>
+              </div>
               <CardContent className="pt-0">
                 {loadingMenu ? (
                   <div className="h-64 flex items-center justify-center">
@@ -405,7 +423,7 @@ export default function KitchenPage() {
                     {menuItems.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-3 rounded-lg border border-line bg-white hover:bg-elevated transition-colors group"
+                        className="flex items-center justify-between p-3 rounded-lg border border-line bg-surface hover:bg-elevated transition-colors group"
                       >
                         <div className="flex items-center gap-3 flex-1">
                           <div className="flex-shrink-0 p-1.5 rounded-lg bg-amber-50 text-amber-600">
@@ -535,11 +553,13 @@ export default function KitchenPage() {
           <Field label="Школа" className="sm:col-span-2">
             <Select>
               <option value="">Выберите школу</option>
-              {schoolsData?.filter((s) => !s.kitchenId).map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} · {s.city}
-                </option>
-              ))}
+              {districtSchools
+                ?.filter((s) => !s.kitchenId)
+                .map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} · {s.city}
+                  </option>
+                ))}
             </Select>
           </Field>
           <div className="flex justify-end gap-2">

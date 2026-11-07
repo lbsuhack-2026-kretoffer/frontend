@@ -57,6 +57,7 @@ export default function AppRouter() {
 
           <Route element={<RoleRoute allow={['canteen', 'platform_admin']} />}>
             <Route path="/kitchen" element={<WithErrorBoundary component={KitchenPage} />} />
+            <Route path="/kitchen/fixed" element={<WithErrorBoundary component={KitchenPage} />} />
           </Route>
 
           <Route element={<RoleRoute allow={['school_admin']} />}>

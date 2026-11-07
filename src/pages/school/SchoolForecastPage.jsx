@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   CalendarClock,
   CheckCircle2,
@@ -155,6 +155,16 @@ export default function SchoolForecastPage() {
   const { toast } = useToast()
 
   const forecast = forecastQuery.data
+
+  const chartData = useMemo(
+    () =>
+      (historyQuery.data || []).map((row) => ({
+        date: row.date,
+        forecast: row.totalPortions,
+        actual: row.present,
+      })),
+    [historyQuery.data]
+  )
 
   const [adjustOpen, setAdjustOpen] = useState(false)
 
@@ -535,7 +545,7 @@ export default function SchoolForecastPage() {
             ) : historyQuery.isError ? (
               <ErrorState description={historyQuery.error.message} onRetry={historyQuery.refetch} />
             ) : (
-              <ForecastChart data={historyQuery.data || []} />
+              <ForecastChart data={chartData} />
             )}
           </CardContent>
         </Card>

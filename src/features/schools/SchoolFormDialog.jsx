@@ -22,7 +22,6 @@ const baseSchema = z.object({
     ),
   email: z.string().email('Некорректный e-mail'),
   mealPlan: z.enum(['fixed', 'canteen'], { required_error: 'Выберите схему питания' }),
-  timezone: z.string().min(1, 'Укажите часовой пояс'),
   bufferPercent: z.coerce.number().min(0, 'Минимум 0%').max(30, 'Максимум 30%'),
   attendanceDeadline: z.string().min(1, 'Укажите дедлайн отметки'),
 })
@@ -49,7 +48,6 @@ const defaultCreate = {
   phone: '',
   email: '',
   mealPlan: 'fixed',
-  timezone: 'Europe/Minsk',
   bufferPercent: 10,
   attendanceDeadline: '09:30',
   adminFullName: '',
@@ -83,13 +81,6 @@ function SchoolFields({ register, errors, includeAdmin = false }) {
         <Select {...register('mealPlan')}>
           <option value="fixed">Фиксированное питание</option>
           <option value="canteen">Шведский стол</option>
-        </Select>
-      </Field>
-      <Field label="Таймзона" error={errors.timezone?.message}>
-        <Select {...register('timezone')}>
-          <option value="Europe/Minsk">Europe/Minsk</option>
-          <option value="Europe/Moscow">Europe/Moscow</option>
-          <option value="Asia/Almaty">Asia/Almaty</option>
         </Select>
       </Field>
       <Field label="Буфер, %" error={errors.bufferPercent?.message} hint="Запас порций на погрешность прогноза">
@@ -195,7 +186,6 @@ export function SchoolEditDialog({ open, onOpenChange, school, scope = 'school' 
         phone: school.phone || '',
         email: school.email || '',
         mealPlan: school.mealPlan || 'fixed',
-        timezone: school.timezone || 'Europe/Minsk',
         bufferPercent: school.bufferPercent ?? 10,
         attendanceDeadline: school.attendanceDeadline || '09:30',
       })

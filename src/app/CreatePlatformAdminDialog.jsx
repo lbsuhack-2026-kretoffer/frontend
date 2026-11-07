@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Dialog } from '@/shared/ui/dialog'
 import { Field, Input } from '@/shared/ui/input'
 import { Button } from '@/shared/ui/button'
+import { useToast } from '@/shared/ui/use-toast'
 import { useCreatePlatformAdmin } from '@/api/hooks'
 
 export function CreatePlatformAdminDialog({ open, onOpenChange }) {
@@ -11,6 +12,7 @@ export function CreatePlatformAdminDialog({ open, onOpenChange }) {
     password: '',
   })
 
+  const { toast } = useToast()
   const createPlatformAdmin = useCreatePlatformAdmin()
 
   const submit = async (event) => {

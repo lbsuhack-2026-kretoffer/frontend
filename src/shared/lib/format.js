@@ -6,12 +6,12 @@ export function formatNumber(value) {
 }
 
 export function formatMoney(value, currency = 'BYN') {
-  if (value === null || value === undefined) return '—'
+  if (value === null || value === undefined || !Number.isFinite(Number(value))) return '—'
   return `${numberFormat.format(Number(value))} ${currency}`
 }
 
 export function formatPercent(value, digits = 0) {
-  if (value === null || value === undefined) return '—'
+  if (value === null || value === undefined || !Number.isFinite(Number(value))) return '—'
   return `${Number(value).toFixed(digits).replace('.', ',')}%`
 }
 

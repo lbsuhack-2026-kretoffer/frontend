@@ -13,7 +13,7 @@ import { StatCard } from '@/shared/ui/stat-card'
 import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
 import { downloadCsv, printPage } from '@/shared/lib/csv'
 import { formatDateShort, relativeDayLabel, todayISO } from '@/shared/lib/date'
-import { formatMoney, formatNumber, formatPercent } from '@/shared/lib/format'
+import { formatMoney, formatNumber, formatPercent, parseNumber } from '@/shared/lib/format'
 
 function accuracyTone(accuracy) {
   if (accuracy >= 0.94) return 'success'
@@ -32,13 +32,13 @@ export default function SchoolReportsPage() {
     if (!rows.length) {
       return { accuracy: 0, waste: 0, wasteCost: 0, forecast: 0, actual: 0 }
     }
-    const accuracy = rows.reduce((sum, row) => sum + row.accuracy, 0) / rows.length
+    const accuracy = rows.reduce((sum, row) => sum + parseNumber(row.accuracy), 0) / rows.length
     return {
       accuracy,
-      waste: rows.reduce((sum, row) => sum + row.wastePortions, 0),
-      wasteCost: rows.reduce((sum, row) => sum + row.wasteCost, 0),
-      forecast: rows.reduce((sum, row) => sum + row.forecast, 0),
-      actual: rows.reduce((sum, row) => sum + row.actual, 0),
+      waste: rows.reduce((sum, row) => sum + parseNumber(row.wastePortions), 0),
+      wasteCost: rows.reduce((sum, row) => sum + parseNumber(row.wasteCost), 0),
+      forecast: rows.reduce((sum, row) => sum + parseNumber(row.forecast), 0),
+      actual: rows.reduce((sum, row) => sum + parseNumber(row.actual), 0),
     }
   }, [rows])
 

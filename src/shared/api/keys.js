@@ -19,4 +19,12 @@ export const qk = {
   teacherClasses: (date) => ['teacher', 'classes', date || 'all'],
   teacherHistory: (days) => ['teacher', 'history', days || 14],
   kitchenMenu: (kitchenId) => ['kitchen-menu', kitchenId],
+  kitchenUser: (kitchenId) => ['kitchen', kitchenId, 'user'],
+  availableSchools: (kitchenId) => ['kitchen', kitchenId, 'available-schools'],
+  kitchenDistrictSchools: (district, mealPlan) => [
+    'kitchen',
+    'district-schools',
+    district,
+    mealPlan || 'all',
+  ],
 }

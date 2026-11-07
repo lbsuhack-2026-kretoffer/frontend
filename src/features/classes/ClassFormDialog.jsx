@@ -9,13 +9,16 @@ import { Field, Input, Select } from '@/shared/ui/input'
 import { useToast } from '@/shared/ui/use-toast'
 import { AGE_GROUP_LABELS } from '@/shared/lib/labels'
 
-const schema = z.object({
+const baseSchema = z.object({
   name: z.string().min(1, 'Укажите название класса').max(64, 'Название слишком длинное'),
   grade: z.coerce.number().min(1, 'Класс 1–11').max(11, 'Класс 1–11'),
   ageGroup: z.enum(['junior', 'middle', 'senior']),
   teacherId: z.string().optional(),
-  // План набора учеников
   letter: z.string().min(1, 'Укажите букву класса').max(2, 'Буква — 1–2 символа'),
+})
+
+const createSchema = baseSchema.extend({
+  // План набора учеников (только при создании)
   studentsCount: z.coerce.number().min(1, 'От 1 ученика').max(60, 'До 60 учеников'),
   studentNames: z
     .string()
@@ -86,6 +89,7 @@ function ClassForm({ formId, register, errors, teachers, onSubmit, isCreate }) {
 
 export function ClassCreateDialog({ open, onOpenChange, schoolId, teachers }) {
   const createClass = useCreateClass(schoolId)
+  const updateClass = useUpdateClass()
   const { toast } = useToast()
   const {
     register,
@@ -93,7 +97,7 @@ export function ClassCreateDialog({ open, onOpenChange, schoolId, teachers }) {
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createSchema),
     defaultValues: {
       name: '',
       grade: 5,
@@ -111,12 +115,21 @@ export function ClassCreateDialog({ open, onOpenChange, schoolId, teachers }) {
 
   const onSubmit = async (values) => {
     try {
-      await createClass.mutateAsync({
+      const result = await createClass.mutateAsync({
         grade: Number(values.grade),
         letter: values.letter.trim().toUpperCase(),
         studentsCount: Number(values.studentsCount),
         studentNames: values.studentNames.split(/\s+/).filter((n) => n.length >= 2),
       })
+
+      // При создании класс бэкенд не принимает teacherId — назначаем учителя отдельно через PATCH
+      if (values.teacherId) {
+        await updateClass.mutateAsync({
+          classId: result.id,
+          payload: { teacherId: values.teacherId },
+        })
+      }
+
       toast({ title: 'Класс создан', description: values.name, variant: 'success' })
       onOpenChange(false)
     } catch (error) {
@@ -161,7 +174,7 @@ export function ClassEditDialog({ open, onOpenChange, cls, teachers }) {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) })
+  } = useForm({ resolver: zodResolver(baseSchema) })
 
   useEffect(() => {
     if (cls && open) {

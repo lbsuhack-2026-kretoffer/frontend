@@ -184,7 +184,7 @@ export default function CanteenHistoryPage() {
                     </TD>
                     <TD>
                       <div className="flex flex-wrap gap-1">
-                        {day.byCategory.map((category) => (
+                        {(day.byCategory || []).map((category) => (
                           <span
                             key={category.id}
                             className="rounded-md bg-elevated px-1.5 py-0.5 text-[10px] text-muted"

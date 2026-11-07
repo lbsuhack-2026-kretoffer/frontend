@@ -2,12 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Download, Pencil, Plus, Trash2, TrendingDown, Utensils, Wallet } from 'lucide-react'
+import { Download, Pencil, Plus, Trash2, TrendingDown, Utensils, Wallet, School } from 'lucide-react'
 import {
   useCanteenCategories,
   useCanteenSales,
   useCreateCanteenCategory,
   useDeleteCanteenCategory,
+  useKitchenDistrictSchools,
+  useSchool,
   useUpdateCanteenCategory,
 } from '@/api/hooks'
 import { useSession } from '@/features/auth/session'
@@ -26,6 +28,7 @@ import { useToast } from '@/shared/ui/use-toast'
 import { downloadCsv } from '@/shared/lib/csv'
 import { formatDateShort } from '@/shared/lib/date'
 import { formatMoney, formatNumber, formatPercent } from '@/shared/lib/format'
+import { MEAL_PLAN_LABELS } from '@/shared/lib/labels'
 
 const schema = z.object({
   name: z.string().min(2, 'Укажите название категории'),
@@ -128,10 +131,19 @@ function CategoryDialog({ open, onOpenChange, schoolId, category }) {
 export default function CanteenItemsPage() {
   const user = useSession((state) => state.user)
   const schoolId = user?.schoolId
+  const schoolQuery = useSchool(schoolId)
+  const isCanteenSchool = schoolQuery.data?.mealPlan === 'canteen'
   const categoriesQuery = useCanteenCategories(schoolId)
   const salesQuery = useCanteenSales(schoolId, 14)
   const deleteCategory = useDeleteCanteenCategory()
   const { toast } = useToast()
+
+  const districtForCanteen = user?.district || schoolQuery.data?.district
+
+  const { data: canteenSchools, isLoading: canteenSchoolsLoading } = useKitchenDistrictSchools(
+    districtForCanteen,
+    'canteen'
+  )
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -220,16 +232,38 @@ export default function CanteenItemsPage() {
     )
   }
 
-  if (categoriesQuery.isLoading || salesQuery.isLoading) return <PageSkeleton />
-  if (categoriesQuery.isError || salesQuery.isError) {
+  if (
+    schoolQuery.isLoading ||
+    categoriesQuery.isLoading ||
+    salesQuery.isLoading ||
+    canteenSchoolsLoading
+  )
+    return <PageSkeleton />
+  if (schoolQuery.isError || categoriesQuery.isError || salesQuery.isError) {
     return (
       <ErrorState
-        description={(categoriesQuery.error || salesQuery.error)?.message}
+        description={
+          (schoolQuery.error || categoriesQuery.error || salesQuery.error)
+            ?.message
+        }
         onRetry={() => {
+          schoolQuery.refetch()
           categoriesQuery.refetch()
           salesQuery.refetch()
         }}
       />
+    )
+  }
+
+  if (!isCanteenSchool) {
+    return (
+      <div className="mt-6 flex items-center justify-center">
+        <EmptyState
+          icon={Utensils}
+          title="Шведский стол недоступен"
+          description="В вашей школе не настроен шведский стол. Обратитесь к администратору платформы."
+        />
+      </div>
     )
   }
 
@@ -297,6 +331,51 @@ export default function CanteenItemsPage() {
           tone="amber"
         />
       </div>
+
+      {/* Список школ района со шведским столом */}
+      {districtForCanteen && (
+        <Card className="mt-4 overflow-hidden">
+          <CardHeader className="flex items-center justify-between">
+            <CardTitle>Школы района со шведским столом</CardTitle>
+            <p className="text-xs text-muted">{districtForCanteen}</p>
+          </CardHeader>
+          <CardContent className="pt-2">
+            {canteenSchoolsLoading ? (
+              <div className="h-40 animate-pulse rounded-xl bg-elevated" />
+            ) : canteenSchools?.length === 0 ? (
+              <EmptyState
+                icon={School}
+                title="Школ со шведским столом не найдено"
+                description="В этом районе нет школ со шведским столом"
+              />
+            ) : (
+              <div className="space-y-2">
+                {canteenSchools.map((school) => (
+                  <div
+                    key={school.id}
+                    className="flex items-center justify-between p-3 rounded-lg border border-line bg-surface hover:bg-elevated transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 p-1.5 rounded-lg bg-amber-50 text-amber-600">
+                        <School className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-strong">{school.name}</div>
+                        <div className="text-[11px] text-muted">
+                          {school.city} · {school.studentsCount} учеников
+                        </div>
+                      </div>
+                    </div>
+                    <Badge tone="brand">
+                      {MEAL_PLAN_LABELS[school.mealPlan]}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
         <Card className="overflow-hidden">

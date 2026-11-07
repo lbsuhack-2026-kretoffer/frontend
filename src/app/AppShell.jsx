@@ -2,16 +2,20 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   ChevronDown,
   GraduationCap,
+  Key,
   LogOut,
+  Mail,
   Menu,
   UserPlus,
+  Utensils,
   X,
 } from 'lucide-react'
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { navFor } from '@/app/nav'
 import RouteFallback from '@/app/RouteFallback'
 import { useSession } from '@/features/auth/session'
+import { useSchool, useKitchenSchools } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Dialog } from '@/shared/ui/dialog'
 import { Avatar } from '@/shared/ui/avatar'
@@ -27,6 +31,8 @@ import { cn } from '@/shared/lib/cn'
 import { formatDate, todayISO } from '@/shared/lib/date'
 import { ROLE_LABELS } from '@/shared/lib/labels'
 import { CreatePlatformAdminDialog } from '@/app/CreatePlatformAdminDialog'
+import { ChangeLoginDialog } from '@/app/ChangeLoginDialog'
+import { ChangePasswordDialog } from '@/app/ChangePasswordDialog'
 
 function Logo({ compact = false }) {
   return (
@@ -82,13 +88,37 @@ export default function AppShell() {
   const queryClient = useQueryClient()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [createAdminOpen, setCreateAdminOpen] = useState(false)
-  const items = navFor(user?.role)
+  const [changeLoginOpen, setChangeLoginOpen] = useState(false)
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+  const baseItems = navFor(user?.role)
 
   const handleLogout = () => {
     logout()
     queryClient.clear()
     navigate('/login', { replace: true })
   }
+
+  // Для работника КШП вкладка "Шведский стол" показывается только если у его КШП
+  // есть хотя бы одна школа со шведским столом (mealPlan === 'canteen')
+  const schoolQuery = useSchool(user?.schoolId)
+  const kitchenId = schoolQuery.data?.kitchenId
+  const schoolsQuery = useKitchenSchools(kitchenId)
+  const [items, setItems] = useState(baseItems)
+
+  useEffect(() => {
+    if (user?.role !== 'canteen') {
+      setItems(baseItems)
+      return
+    }
+    if (!kitchenId || schoolsQuery.isLoading || schoolsQuery.isError) return
+    const hasCanteen = schoolsQuery.data?.some((s) => s.mealPlan === 'canteen')
+    setItems([
+      ...baseItems.filter((i) => i.to !== '/canteen/items'),
+      ...(hasCanteen
+        ? [{ to: '/canteen/items', label: 'Шведский стол', icon: Utensils }]
+        : []),
+    ])
+  }, [user?.role, kitchenId, schoolsQuery.data, schoolsQuery.isLoading, schoolsQuery.isError, baseItems])
 
   const activeItem =
     items.find((item) => item.to === location.pathname) ||
@@ -136,6 +166,16 @@ export default function AppShell() {
                   Создать суперадмина
                 </DropdownMenuItem>
               )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setChangeLoginOpen(true)}>
+                <Mail className="h-3.5 w-3.5" />
+                Сменить логин (e-mail)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setChangePasswordOpen(true)}>
+                <Key className="h-3.5 w-3.5" />
+                Сменить пароль
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={handleLogout} className="text-red-400">
                 <LogOut className="h-3.5 w-3.5" />
                 Выйти
@@ -234,6 +274,8 @@ export default function AppShell() {
         </div>
       </Dialog>
       <CreatePlatformAdminDialog open={createAdminOpen} onOpenChange={setCreateAdminOpen} />
+      <ChangeLoginDialog open={changeLoginOpen} onOpenChange={setChangeLoginOpen} />
+      <ChangePasswordDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen} />
     </div>
   )
 }

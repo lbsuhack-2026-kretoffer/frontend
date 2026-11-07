@@ -9,7 +9,7 @@ import { Select } from '@/shared/ui/input'
 import { PageSkeleton } from '@/shared/ui/skeleton'
 import { StatCard } from '@/shared/ui/stat-card'
 import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
-import { formatDate, relativeDayLabel } from '@/shared/lib/date'
+import { formatDate, formatTime, relativeDayLabel } from '@/shared/lib/date'
 import { formatNumber, formatPercent } from '@/shared/lib/format'
 
 export default function TeacherHistoryPage() {
@@ -156,7 +156,7 @@ export default function TeacherHistoryPage() {
                   <TD>
                     <div className="flex items-center gap-1.5 text-xs text-muted">
                       <CalendarCheck2 className="h-3.5 w-3.5 text-subtle" />
-                      {item.submittedAt}
+                      {formatTime(item.submittedAt)}
                       {item.submittedByName ? (
                         <span className="hidden text-subtle sm:inline">· {item.submittedByName}</span>
                       ) : null}

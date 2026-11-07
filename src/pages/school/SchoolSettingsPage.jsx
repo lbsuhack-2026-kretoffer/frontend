@@ -84,19 +84,14 @@ export default function SchoolSettingsPage() {
     }
   }
 
-  const toggleIntegration = async (key, checked) => {
+  const toggleIntegration = async (key, _checked) => {
     setIntegrationPending(key)
     try {
-      await updateSchool.mutateAsync({
-        schoolId: school.id,
-        payload: { integrations: { [key]: checked } },
-      })
       toast({
-        title: checked ? 'Интеграция включена' : 'Интеграция отключена',
-        variant: 'success',
+        title: 'Интеграции пока недоступны',
+        description: 'Скоро появится возможность подключить кассу и СКУД.',
+        variant: 'default',
       })
-    } catch (error) {
-      toast({ title: 'Не удалось изменить интеграцию', description: error.message, variant: 'error' })
     } finally {
       setIntegrationPending(null)
     }

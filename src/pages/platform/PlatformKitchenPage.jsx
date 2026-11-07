@@ -1,6 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Plus, Utensils, Menu, Link, Unlink, Trash2 } from 'lucide-react'
-import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useDeleteKitchen, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
+import { Factory, Plus, Menu, Link, Unlink, Trash2, Pencil } from 'lucide-react'
+import {
+  useCreateKitchen,
+  useCreateKitchenUser,
+  useDeleteKitchen,
+  useKitchenSchools,
+  useKitchenUser,
+  useLinkKitchenSchools,
+  useSetSchoolKitchen,
+  useUpdateKitchen,
+} from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { ConfirmDialog, Dialog } from '@/shared/ui/dialog'
@@ -91,97 +100,77 @@ function CreateKitchenDialog({ open, onOpenChange, onKitchenCreated }) {
   )
 }
 
-function MenuItemDialog({ open, onOpenChange, kitchenId, onMenuItemAdded }) {
-  const [name, setName] = useState('')
-  const [price, setPrice] = useState('')
+function EditKitchenDialog({ open, onOpenChange, kitchen }) {
+  const [name, setName] = useState(kitchen?.name || '')
+  const [district, setDistrict] = useState(kitchen?.district || '')
+  const [email, setEmail] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [password, setPassword] = useState('')
   const { toast } = useToast()
-  const createMenuItem = useCreateMenuItem()
+  const updateKitchen = useUpdateKitchen()
+  const { data: kitchenUser } = useKitchenUser(kitchen?.id)
+
+  useEffect(() => {
+    if (open && kitchen) {
+      setName(kitchen.name || '')
+      setDistrict(kitchen.district || '')
+      setEmail(kitchenUser?.email || '')
+      setFullName(kitchenUser?.fullName || '')
+      setPassword('')
+    }
+  }, [open, kitchen, kitchenUser])
 
   const submit = async (event) => {
     event.preventDefault()
     if (!name.trim()) {
-      toast({ title: 'Укажите название блюда', variant: 'error' })
+      toast({ title: 'Укажите название КШП', variant: 'error' })
       return
     }
-    if (!price.trim() || isNaN(Number(price))) {
-      toast({ title: 'Укажите корректную цену', variant: 'error' })
+    if (!district.trim()) {
+      toast({ title: 'Укажите район', variant: 'error' })
       return
     }
     try {
-      await createMenuItem.mutateAsync({ kitchenId, payload: { name: name.trim(), price: Number(price) } })
-      toast({ title: 'Блюдо добавлено', variant: 'success' })
-      setName('')
-      setPrice('')
-      onMenuItemAdded?.()
+      await updateKitchen.mutateAsync({
+        kitchenId: kitchen.id,
+        payload: {
+          name: name.trim(),
+          district: district.trim(),
+          ...(email.trim() ? { email: email.trim() } : null),
+          ...(fullName.trim() ? { fullName: fullName.trim() } : null),
+          ...(password.trim() ? { password: password.trim() } : null),
+        },
+      })
+      toast({ title: 'КШП обновлено', variant: 'success' })
       onOpenChange(false)
     } catch (error) {
-      toast({ title: 'Не удалось добавить блюдо', description: error.message, variant: 'error' })
+      toast({ title: 'Не удалось обновить КШП', description: error.message, variant: 'error' })
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} title="Добавить блюдо в меню">
+    <Dialog open={open} onOpenChange={onOpenChange} title="Редактировать КШП">
       <form onSubmit={submit} className="grid gap-3 p-4">
-        <Field label="Название блюда">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Горячее" />
+        <Field label="Название КШП" className="sm:col-span-2">
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="КШП Центральный" />
         </Field>
-        <Field label="Цена, BYN">
-          <Input type="number" min="0" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
+        <Field label="Район">
+          <Input value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="Центральный район" />
+        </Field>
+        <Field label="Логин общего аккаунта КШП (e-mail)">
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="kitchen@school.by" />
+        </Field>
+        <Field label="ФИО сотрудника КШП" className="sm:col-span-2">
+          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Иван Петров" />
+        </Field>
+        <Field label="Новый пароль общего аккаунта КШП" type="password">
+          <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
         </Field>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Отмена
           </Button>
-          <Button type="submit">Добавить</Button>
-        </div>
-      </form>
-    </Dialog>
-  )
-}
-
-function AttachSchoolDialog({ open, onOpenChange, kitchenId, schools }) {
-  const [schoolId, setSchoolId] = useState('')
-  const { toast } = useToast()
-  const setSchoolKitchen = useSetSchoolKitchen()
-
-  const submit = async (event) => {
-    event.preventDefault()
-    if (!schoolId) {
-      toast({ title: 'Выберите школу', variant: 'error' })
-      return
-    }
-    try {
-      await setSchoolKitchen.mutateAsync({ schoolId, kitchenId })
-      toast({ title: 'Школа привязана к КШП', variant: 'success' })
-      setSchoolId('')
-      onOpenChange(false)
-    } catch (error) {
-      toast({ title: 'Не удалось привязать школу', description: error.message, variant: 'error' })
-    }
-  }
-
-  const available = schools.filter((s) => !s.kitchenId)
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange} title="Привязать школу к КШП">
-      <form onSubmit={submit} className="grid gap-3 p-4">
-        <Field label="Школа" className="sm:col-span-2">
-          <Select value={schoolId} onValueChange={setSchoolId}>
-            <option value="">Выберите школу</option>
-            {available.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} · {s.city}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Отмена
-          </Button>
-          <Button type="submit" disabled={!schoolId}>
-            Привязать
-          </Button>
+          <Button type="submit">Сохранить</Button>
         </div>
       </form>
     </Dialog>
@@ -191,17 +180,24 @@ function AttachSchoolDialog({ open, onOpenChange, kitchenId, schools }) {
 export default function PlatformKitchenPage() {
   const [kitchens, setKitchens] = useState([])
   const [selectedKitchen, setSelectedKitchen] = useState(null)
-  const [menuItems, setMenuItems] = useState([])
   const [kitchenSchools, setKitchenSchools] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [attachOpen, setAttachOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [kitchenToDelete, setKitchenToDelete] = useState(null)
+  const [kitchenToEdit, setKitchenToEdit] = useState(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [editDistrict, setEditDistrict] = useState('')
+  const [editEmail, setEditEmail] = useState('')
+  const [editFullName, setEditFullName] = useState('')
+  const [editPassword, setEditPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const setSchoolKitchen = useSetSchoolKitchen()
+  const linkKitchenSchools = useLinkKitchenSchools()
   const deleteKitchen = useDeleteKitchen()
+  const updateKitchen = useUpdateKitchen()
 
   const loadKitchens = useCallback(async () => {
     setLoading(true)
@@ -217,19 +213,8 @@ export default function PlatformKitchenPage() {
     }
   }, [toast])
 
-  const loadMenu = async (kitchenId) => {
-    if (!kitchenId) return
-    try {
-      const res = await fetch(`/api/v1/kitchen/kitchens/${kitchenId}/menu`, { credentials: 'include', cache: 'no-store' })
-      if (!res.ok) throw new Error(`Ошибка ${res.status}: не удалось загрузить меню`)
-      const data = await res.json()
-      setMenuItems(data || [])
-    } catch (error) {
-      toast({ title: 'Не удалось загрузить меню', description: error.message, variant: 'error' })
-    }
-  }
-
-  const { data: schoolsData } = useKitchenSchools(selectedKitchen?.id)
+  const kitchenSchoolsQuery = useKitchenSchools(selectedKitchen?.id)
+  const { data: schoolsData } = kitchenSchoolsQuery
 
   useEffect(() => {
     if (schoolsData) setKitchenSchools(schoolsData)
@@ -243,8 +228,27 @@ export default function PlatformKitchenPage() {
     try {
       await setSchoolKitchen.mutateAsync({ schoolId, kitchenId: null })
       toast({ title: 'Школа отвязана от КШП', variant: 'success' })
+      await loadKitchens()
     } catch (error) {
       toast({ title: 'Не удалось отвязать школу', description: error.message, variant: 'error' })
+    }
+  }
+
+  const handleLinkDistrictSchools = async () => {
+    if (!selectedKitchen?.id) return
+    try {
+      const res = await linkKitchenSchools.mutateAsync(selectedKitchen.id)
+      toast({
+        title: 'Школы привязаны к КШП',
+        description: `Привязано школ: ${res.linked || 0} (район: ${selectedKitchen.district})`,
+        variant: 'success',
+      })
+      await loadKitchens()
+      if (selectedKitchen?.id) {
+        await kitchenSchoolsQuery.refetch()
+      }
+    } catch (error) {
+      toast({ title: 'Не удалось привязать школы', description: error.message, variant: 'error' })
     }
   }
 
@@ -264,9 +268,59 @@ export default function PlatformKitchenPage() {
     }
   }
 
-  const selectKitchen = async (kitchen) => {
+  const openEditKitchen = (kitchen) => {
+    setKitchenToEdit(kitchen)
+    setEditName(kitchen.name || '')
+    setEditDistrict(kitchen.district || '')
+    setEditEmail('')
+    setEditFullName('')
+    setEditPassword('')
+    setEditOpen(true)
+  }
+
+  const handleUpdateKitchen = async () => {
+    if (!kitchenToEdit) return
+    const payload = {}
+    if (editName.trim()) payload.name = editName.trim()
+    if (editDistrict.trim()) payload.district = editDistrict.trim()
+    if (editEmail.trim()) payload.email = editEmail.trim()
+    if (editFullName.trim()) payload.fullName = editFullName.trim()
+    if (editPassword.trim()) payload.password = editPassword.trim()
+    try {
+      await updateKitchen.mutateAsync({ kitchenId: kitchenToEdit.id, payload })
+      toast({ title: 'КШП обновлено', variant: 'success' })
+      setEditOpen(false)
+      setKitchenToEdit(null)
+      setEditName('')
+      setEditDistrict('')
+      setEditEmail('')
+      setEditFullName('')
+      setEditPassword('')
+      await loadKitchens()
+
+      // Обновить выбранную кьюшню, чтобы новые значения сразу были видны на странице
+      if (selectedKitchen?.id === kitchenToEdit.id) {
+        const updated = kitchens.find((k) => k.id === kitchenToEdit.id)
+        if (updated) setSelectedKitchen(updated)
+      }
+
+      // Если изменился район — отвязываем все школы от КШП (КШП обслуживает только свой район)
+      if (payload.district && payload.district !== kitchenToEdit.district && kitchenSchools.length > 0) {
+        for (const school of kitchenSchools) {
+          await setSchoolKitchen.mutateAsync({ schoolId: school.id, kitchenId: null })
+        }
+        toast({ title: 'Район изменён. Все школы отвязаны от КШП', variant: 'warning' })
+        if (selectedKitchen?.id === kitchenToEdit.id) {
+          setSelectedKitchen(null)
+        }
+      }
+    } catch (error) {
+      toast({ title: 'Не удалось обновить КШП', description: error.message, variant: 'error' })
+    }
+  }
+
+  const selectKitchen = (kitchen) => {
     setSelectedKitchen(kitchen)
-    await loadMenu(kitchen.id)
   }
 
   return (
@@ -314,13 +368,16 @@ export default function PlatformKitchenPage() {
                           <div className="font-medium text-strong">{kitchen.name}</div>
                           <div className="text-[11px] text-muted">{kitchen.district}</div>
                         </div>
-                        <Button size="sm" variant="outline" onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedKitchen(kitchen)
-                          loadMenu(kitchen.id)
-                        }}>
-                          <Utensils className="h-3.5 w-3.5 mr-1" />
-                          Меню
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            openEditKitchen(kitchen)
+                          }}
+                        >
+                          <Pencil className="h-3.5 w-3.5 mr-1" />
+                          Редактировать
                         </Button>
                       </div>
                       <Button
@@ -355,8 +412,16 @@ export default function PlatformKitchenPage() {
             <>
               {/* Школы КШП */}
               <Card className="overflow-hidden">
-                <CardHeader>
+                <CardHeader className="flex items-center justify-between">
                   <CardTitle>Школы КШП: {selectedKitchen.name}</CardTitle>
+                  <Button
+                    size="sm"
+                    onClick={handleLinkDistrictSchools}
+                    disabled={!selectedKitchen?.id || linkKitchenSchools.isPending}
+                  >
+                    <Link className="h-3.5 w-3.5 mr-1" />
+                    Привязать все школы района
+                  </Button>
                 </CardHeader>
                 <CardContent className="pt-2">
                   {kitchenSchools.length === 0 ? (
@@ -364,12 +429,6 @@ export default function PlatformKitchenPage() {
                       icon={Link}
                       title="Школ пока нет"
                       description="Привяжите школы этого района к КШП"
-                      action={
-                        <Button onClick={() => setAttachOpen(true)}>
-                          <Link className="h-3.5 w-3.5" />
-                          Привязать первую школу
-                        </Button>
-                      }
                     />
                   ) : (
                     <Table>
@@ -405,45 +464,6 @@ export default function PlatformKitchenPage() {
                 </CardContent>
               </Card>
 
-              {/* Меню КШП */}
-              <Card className="overflow-hidden mt-4">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Меню КШП: {selectedKitchen.name}</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Button onClick={() => setMenuOpen(true)}>
-                        <Plus className="h-3.5 w-3.5" />
-                        Добавить блюдо
-                      </Button>
-                      <Button variant="outline" onClick={() => setMenuOpen(false)}>
-                        Закрыть
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  {menuItems.length === 0 ? (
-                    <EmptyState icon={Utensils} title="Блюд пока нет" description="Добавьте первое блюдо в меню" />
-                  ) : (
-                    <Table>
-                      <THead>
-                        <TR>
-                          <TH>Блюдо</TH>
-                          <TH className="text-right">Цена, BYN</TH>
-                        </TR>
-                      </THead>
-                      <TBody>
-                        {menuItems.map((item) => (
-                          <TR key={item.id}>
-                            <TD>{item.name}</TD>
-                            <TD className="text-right">{item.price.toFixed(2)}</TD>
-                          </TR>
-                        ))}
-                      </TBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
             </>
           )}
         </div>
@@ -454,17 +474,10 @@ export default function PlatformKitchenPage() {
         onOpenChange={setCreateOpen}
         onKitchenCreated={loadKitchens}
       />
-      <MenuItemDialog
-        open={menuOpen}
-        onOpenChange={setMenuOpen}
-        kitchenId={selectedKitchen?.id}
-        onMenuItemAdded={() => selectedKitchen?.id && loadMenu(selectedKitchen.id)}
-      />
-      <AttachSchoolDialog
-        open={attachOpen}
-        onOpenChange={setAttachOpen}
-        kitchenId={selectedKitchen?.id}
-        schools={kitchenSchools}
+      <EditKitchenDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        kitchen={kitchenToEdit}
       />
       <ConfirmDialog
         open={deleteOpen}

@@ -37,6 +37,7 @@ import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
 import { useToast } from '@/shared/ui/use-toast'
 import { todayISO } from '@/shared/lib/date'
 import { formatNumber } from '@/shared/lib/format'
+import { cn } from '@/shared/lib/cn'
 import { AGE_GROUP_LABELS, AGE_GROUP_TONE, MEAL_STATUS_LABELS } from '@/shared/lib/labels'
 
 const SEARCH_MODES = [

@@ -200,6 +200,14 @@ export function useSetSchoolAccess() {
   })
 }
 
+export function useDeleteSchool() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: (schoolId) => api.delete(`/platform/schools/${schoolId}`),
+    onSuccess: refresh,
+  })
+}
+
 export function useCreateClass(schoolId) {
   const refresh = useRefresh()
   return useMutation({
@@ -349,6 +357,20 @@ export function useCreatePlatformAdmin() {
   })
 }
 
+export function useChangeLogin() {
+  const setUser = useSession((state) => state.setUser)
+  return useMutation({
+    mutationFn: (payload) => api.post('/auth/me/change-login', payload),
+    onSuccess: (user) => setUser(user),
+  })
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (payload) => api.post('/auth/me/change-password', payload),
+  })
+}
+
 export function useCreateKitchen() {
   const refresh = useRefresh()
   return useMutation({
@@ -362,6 +384,23 @@ export function useDeleteKitchen() {
   return useMutation({
     mutationFn: (kitchenId) => api.delete(`/platform/kitchens/${kitchenId}`),
     onSuccess: refresh,
+  })
+}
+
+export function useUpdateKitchen() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: ({ kitchenId, payload }) =>
+      api.patch(`/platform/kitchens/${kitchenId}`, payload),
+    onSuccess: refresh,
+  })
+}
+
+export function useKitchenUser(kitchenId) {
+  return useQuery({
+    queryKey: qk.kitchenUser(kitchenId),
+    queryFn: () => api.get(`/platform/kitchens/${kitchenId}/user`),
+    enabled: Boolean(kitchenId),
   })
 }
 
@@ -386,7 +425,24 @@ export function useCreateKitchenUser() {
 export function useKitchenSchools(kitchenId) {
   return useQuery({
     queryKey: qk.school(kitchenId),
-    queryFn: () => api.get(`/platform/kitchens/${kitchenId}/schools`),
+    queryFn: () => api.get(`/kitchen/kitchens/${kitchenId}/schools`),
+    enabled: Boolean(kitchenId),
+  })
+}
+
+export function useKitchenDistrictSchools(district, mealPlan) {
+  return useQuery({
+    queryKey: qk.kitchenDistrictSchools(district, mealPlan),
+    queryFn: () =>
+      api.get(`/kitchen/schools`, { query: { district, mealPlan } }),
+    enabled: Boolean(district),
+  })
+}
+
+export function useAvailableKitchenSchools(kitchenId) {
+  return useQuery({
+    queryKey: qk.availableSchools(kitchenId),
+    queryFn: () => api.get(`/platform/kitchens/${kitchenId}/available-schools`),
     enabled: Boolean(kitchenId),
   })
 }
@@ -396,6 +452,14 @@ export function useSetSchoolKitchen() {
   return useMutation({
     mutationFn: ({ schoolId, kitchenId }) =>
       api.patch(`/platform/schools/${schoolId}/kitchen`, { kitchenId: kitchenId || null }),
+    onSuccess: refresh,
+  })
+}
+
+export function useLinkKitchenSchools() {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: (kitchenId) => api.post(`/platform/kitchens/${kitchenId}/link-schools`),
     onSuccess: refresh,
   })
 }

@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
-import { ArrowRight, Ban, CheckCircle2, Plus, School as SchoolIcon, Search } from 'lucide-react'
+import { ArrowRight, Ban, CheckCircle2, Plus, School as SchoolIcon, Search, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { usePlatformSchools, useSetSchoolAccess } from '@/api/hooks'
+import { useDeleteSchool, usePlatformSchools, useSetSchoolAccess } from '@/api/hooks'
 import { SchoolCreateDialog } from '@/features/schools/SchoolFormDialog'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { buttonStyles } from '@/shared/ui/button-styles'
 import { Card } from '@/shared/ui/card'
+import { ConfirmDialog, Dialog } from '@/shared/ui/dialog'
 import { EmptyState, ErrorState } from '@/shared/ui/empty-state'
 import { Input } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
@@ -20,8 +21,11 @@ import { MEAL_PLAN_LABELS } from '@/shared/lib/labels'
 export default function PlatformSchoolsPage() {
   const [query, setQuery] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [schoolToDelete, setSchoolToDelete] = useState(null)
   const schools = usePlatformSchools({ query, pageSize: 50 })
   const setAccess = useSetSchoolAccess()
+  const deleteSchool = useDeleteSchool()
   const { toast } = useToast()
 
   const items = useMemo(() => schools.data?.items || [], [schools.data])
@@ -36,6 +40,19 @@ export default function PlatformSchoolsPage() {
       })
     } catch (error) {
       toast({ title: 'Не удалось изменить доступ', description: error.message, variant: 'error' })
+    }
+  }
+
+  const handleDeleteSchool = async () => {
+    if (!schoolToDelete) return
+    try {
+      await deleteSchool.mutateAsync(schoolToDelete.id)
+      toast({ title: 'Школа удалена', variant: 'success' })
+      setDeleteOpen(false)
+      setSchoolToDelete(null)
+      schools.refetch()
+    } catch (error) {
+      toast({ title: 'Не удалось удалить школу', description: error.message, variant: 'error' })
     }
   }
 
@@ -94,6 +111,7 @@ export default function PlatformSchoolsPage() {
               <TR>
                 <TH>Школа</TH>
                 <TH>Город</TH>
+                <TH>Район</TH>
                 <TH>Питание</TH>
                 <TH>Ученики</TH>
                 <TH>Классы</TH>
@@ -119,6 +137,7 @@ export default function PlatformSchoolsPage() {
                     </Link>
                   </TD>
                   <TD>{school.city}</TD>
+                  <TD>{school.district || '—'}</TD>
                   <TD>
                     <Badge tone={school.mealPlan === 'canteen' ? 'violet' : 'neutral'}>
                       {MEAL_PLAN_LABELS[school.mealPlan]}
@@ -160,6 +179,18 @@ export default function PlatformSchoolsPage() {
                       >
                         <ArrowRight className="h-4 w-4" />
                       </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSchoolToDelete(school)
+                          setDeleteOpen(true)
+                        }}
+                        aria-label={`Удалить ${school.name}`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                      </Button>
                     </div>
                   </TD>
                 </TR>
@@ -170,6 +201,19 @@ export default function PlatformSchoolsPage() {
       </Card>
 
       <SchoolCreateDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={(open) => !open && setDeleteOpen(false)}
+        title="Удалить школу?"
+        description={
+          schoolToDelete
+            ? `Школа «${schoolToDelete.name}» и все связанные с ней классы, ученики и посещаемость будут удалены безвозвратно.`
+            : ''
+        }
+        confirmLabel="Удалить"
+        loading={deleteSchool.isPending}
+        onConfirm={handleDeleteSchool}
+      />
     </>
   )
 }

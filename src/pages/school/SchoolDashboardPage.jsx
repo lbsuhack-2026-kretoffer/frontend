@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   AlertTriangle,
   ArrowRight,
@@ -44,6 +45,16 @@ export default function SchoolDashboardPage() {
   const forecastQuery = useForecast(schoolId, tomorrow)
   const historyQuery = useForecastHistory(schoolId)
   const classesQuery = useSchoolClasses(schoolId, today)
+
+  const chartData = useMemo(
+    () =>
+      (historyQuery.data || []).map((row) => ({
+        date: row.date,
+        forecast: row.totalPortions,
+        actual: row.present,
+      })),
+    [historyQuery.data]
+  )
 
   if (!schoolId) {
     return (
@@ -279,7 +290,7 @@ export default function SchoolDashboardPage() {
             ) : historyQuery.isError ? (
               <ErrorState description={historyQuery.error.message} onRetry={historyQuery.refetch} />
             ) : (
-              <ForecastChart data={historyQuery.data || []} />
+              <ForecastChart data={chartData} />
             )}
           </CardContent>
         </Card>

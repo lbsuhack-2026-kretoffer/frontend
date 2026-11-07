@@ -12,7 +12,8 @@ import {
   Users,
 } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
-import { useAttendance, useSaveAttendance } from '@/api/hooks'
+import { useAttendance, useForecast, useSaveAttendance } from '@/api/hooks'
+import { useSession } from '@/features/auth/session'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
@@ -22,7 +23,7 @@ import { Input, Select } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
 import { PageSkeleton } from '@/shared/ui/skeleton'
 import { useToast } from '@/shared/ui/use-toast'
-import { formatDate, relativeDayLabel, todayISO } from '@/shared/lib/date'
+import { formatDate, formatTime, relativeDayLabel, todayISO } from '@/shared/lib/date'
 import { formatNumber, studentsLabel } from '@/shared/lib/format'
 import { cn } from '@/shared/lib/cn'
 
@@ -41,9 +42,13 @@ function setsEqual(a, b) {
 export default function AttendancePage() {
   const { classId } = useParams()
   const { toast } = useToast()
+  const user = useSession((state) => state.user)
   const [date, setDate] = useState(todayISO())
   const query = useAttendance(classId, date)
+  const forecastQuery = useForecast(user?.schoolId, date)
   const save = useSaveAttendance()
+
+  const approved = forecastQuery.data?.status === 'approved'
 
   const [draft, setDraft] = useState(null)
   const [search, setSearch] = useState('')
@@ -102,6 +107,7 @@ export default function AttendancePage() {
   const marked = data.status === 'submitted'
 
   const toggleStudent = (studentId, checked) => {
+    if (approved) return
     updateAbsent((current) => {
       const next = new Set(current)
       if (checked) next.add(studentId)
@@ -185,7 +191,7 @@ export default function AttendancePage() {
           </div>
           <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm">
             <p className="text-xs text-muted">Сохранено</p>
-            <p className="mt-1 text-2xl font-semibold text-strong">{data.submittedAt || '—'}</p>
+            <p className="mt-1 text-2xl font-semibold text-strong">{formatTime(data.submittedAt)}</p>
             <p className="mt-1 truncate text-[11px] text-muted">
               {data.submittedByName ? `кем: ${data.submittedByName}` : 'ещё не сохраняли'}
             </p>
@@ -255,7 +261,7 @@ export default function AttendancePage() {
                         >
                           <Checkbox
                             checked={isAbsent}
-                            disabled={isOptOut}
+                            disabled={isOptOut || approved}
                             onCheckedChange={(checked) => toggleStudent(student.id, checked === true)}
                             aria-label={`Отсутствует: ${student.fullName}`}
                           />
@@ -338,9 +344,10 @@ export default function AttendancePage() {
               <CardContent className="pt-2">
                 {marked ? (
                   <p className="text-xs text-muted">
-                    Отметка сохранена {data.submittedAt}
-                    {data.submittedByName ? ` · ${data.submittedByName}` : ''}. Можно изменить и сохранить ещё
-                    раз.
+                    Отметка сохранена {formatTime(data.submittedAt)}
+                    {data.submittedByName ? ` · ${data.submittedByName}` : ''}.{approved
+                      ? ' Заявка подтверждена завучом — изменять отсутствующих невозможно.'
+                      : ' Можно изменить и сохранить ещё раз.'}
                   </p>
                 ) : (
                   <p className="flex items-start gap-2 text-xs text-amber-300">
@@ -365,9 +372,13 @@ export default function AttendancePage() {
               {formatNumber(stats.optOuts)} не обедают
             </p>
           </div>
-          <Button onClick={handleSave} loading={save.isPending} disabled={!dirty}>
+          <Button
+            onClick={handleSave}
+            loading={save.isPending}
+            disabled={!dirty || approved}
+          >
             <Save className="h-4 w-4" />
-            Сохранить отметку
+            {approved ? 'Подтверждено завучом' : 'Сохранить отметку'}
           </Button>
         </div>
       </div>

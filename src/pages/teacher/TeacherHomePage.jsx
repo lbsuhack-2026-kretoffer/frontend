@@ -19,7 +19,7 @@ import { PageHeader } from '@/shared/ui/page-header'
 import { Progress } from '@/shared/ui/progress'
 import { PageSkeleton } from '@/shared/ui/skeleton'
 import { StatCard } from '@/shared/ui/stat-card'
-import { formatDate, todayISO } from '@/shared/lib/date'
+import { formatDate, formatTime, todayISO } from '@/shared/lib/date'
 import { formatNumber, studentsLabel } from '@/shared/lib/format'
 import { AGE_GROUP_LABELS, AGE_GROUP_TONE } from '@/shared/lib/labels'
 
@@ -200,7 +200,7 @@ export default function TeacherHomePage() {
                         <p className="text-[11px] text-muted">
                           {marked
                             ? `${formatNumber(absent)} отсутствуют${
-                                cls.attendance?.submittedAt ? ` · ${cls.attendance.submittedAt}` : ''
+                                cls.attendance?.submittedAt ? ` · ${formatTime(cls.attendance.submittedAt)}` : ''
                               }`
                             : `до дедлайна ${deadline}`}
                         </p>

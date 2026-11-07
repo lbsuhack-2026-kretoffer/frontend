@@ -17,6 +17,7 @@ import {
 import { Link, useParams } from 'react-router-dom'
 import {
   useAssignSchoolAdmin,
+  useDeleteSchool,
   useInviteTeacher,
   useRevokeSchoolAdmin,
   useSchool,
@@ -326,6 +327,7 @@ export default function PlatformSchoolPage() {
   const teachersQuery = useSchoolTeachers(schoolId)
   const setAccess = useSetSchoolAccess()
   const revokeAdmin = useRevokeSchoolAdmin()
+  const deleteSchool = useDeleteSchool()
   const { toast } = useToast()
 
   const [editOpen, setEditOpen] = useState(false)
@@ -333,6 +335,7 @@ export default function PlatformSchoolPage() {
   const [teacherOpen, setTeacherOpen] = useState(false)
   const [guardOpen, setGuardOpen] = useState(false)
   const [adminToRevoke, setAdminToRevoke] = useState(null)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   if (schoolQuery.isLoading) return <PageSkeleton />
   if (schoolQuery.isError) {
@@ -364,6 +367,16 @@ export default function PlatformSchoolPage() {
     }
   }
 
+  const handleDeleteSchool = async () => {
+    try {
+      await deleteSchool.mutateAsync(schoolId)
+      toast({ title: 'Школа удалена', variant: 'success' })
+      setDeleteOpen(false)
+    } catch (error) {
+      toast({ title: 'Не удалось удалить школу', description: error.message, variant: 'error' })
+    }
+  }
+
   return (
     <>
       <Link to="/platform/schools" className="mb-3 inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-strong">
@@ -392,6 +405,14 @@ export default function PlatformSchoolPage() {
               {school.accessEnabled ? <Ban className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
               {school.accessEnabled ? 'Блокировать' : 'Разблокировать'}
             </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setDeleteOpen(true)}
+              aria-label="Удалить школу"
+            >
+              <Trash2 className="h-4 w-4 text-red-400" />
+            </Button>
           </>
         }
       />
@@ -419,11 +440,11 @@ export default function PlatformSchoolPage() {
               </CardHeader>
               <CardContent className="pt-1">
                 <DetailRow label="Город" value={school.city} />
+                <DetailRow label="Район" value={school.district || '—'} />
                 <DetailRow label="Адрес" value={school.address} />
                 <DetailRow label="Телефон" value={school.phone} />
                 <DetailRow label="E-mail" value={school.email} />
                 <DetailRow label="Схема питания" value={MEAL_PLAN_LABELS[school.mealPlan]} />
-                <DetailRow label="Таймзона" value={school.timezone} />
                 <DetailRow label="Буфер на погрешность" value={`${school.bufferPercent}%`} />
                 <DetailRow label="Дедлайн отметки" value={school.attendanceDeadline} />
                 <DetailRow label="Подключена" value={formatDate(school.createdAt)} />
@@ -654,6 +675,15 @@ export default function PlatformSchoolPage() {
         confirmLabel="Отозвать"
         loading={revokeAdmin.isPending}
         onConfirm={handleRevoke}
+      />
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={(open) => !open && setDeleteOpen(false)}
+        title="Удалить школу?"
+        description={`Школа «${school.name}» и все связанные с ней классы, ученики и посещаемость будут удалены безвозвратно.`}
+        confirmLabel="Удалить"
+        loading={deleteSchool.isPending}
+        onConfirm={handleDeleteSchool}
       />
     </>
   )

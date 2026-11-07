@@ -34,9 +34,10 @@ export const NAV_BY_ROLE = {
   ],
   canteen: [
     { to: '/kitchen', label: 'Кабинет КШП', icon: Factory, end: true },
-    { to: '/canteen', label: 'Заявка на завтра', icon: ClipboardCheck },
-    { to: '/canteen/items', label: 'Шведский стол', icon: Utensils },
-    { to: '/canteen/history', label: 'История', icon: ChartNoAxesColumn },
+    { to: '/canteen', label: 'Заявка на завтра', icon: ClipboardCheck, end: true },
+    { to: '/canteen/items', label: 'Шведский стол', icon: Utensils, end: true },
+    { to: '/kitchen/fixed', label: 'Фиксированное питание', icon: ShieldCheck, end: true },
+    { to: '/canteen/history', label: 'История', icon: ChartNoAxesColumn, end: true },
   ],
   guard: [
     { to: '/guard', label: 'Отметка входа', icon: DoorOpen, end: true },
