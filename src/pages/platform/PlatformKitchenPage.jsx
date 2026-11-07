@@ -14,6 +14,7 @@ function CreateKitchenDialog({ open, onOpenChange }) {
   const [name, setName] = useState('')
   const [district, setDistrict] = useState('')
   const [email, setEmail] = useState('')
+  const [fullName, setFullName] = useState('')
   const [password, setPassword] = useState('')
   const { toast } = useToast()
   const createKitchen = useCreateKitchen()
@@ -32,6 +33,10 @@ function CreateKitchenDialog({ open, onOpenChange }) {
       toast({ title: 'Укажите логин (e-mail) общего аккаунта КШП', variant: 'error' })
       return
     }
+    if (!fullName.trim()) {
+      toast({ title: 'Укажите ФИО сотрудника КШП', variant: 'error' })
+      return
+    }
     if (!password.trim()) {
       toast({ title: 'Укажите пароль общего аккаунта КШП', variant: 'error' })
       return
@@ -41,13 +46,16 @@ function CreateKitchenDialog({ open, onOpenChange }) {
         name: name.trim(),
         district: district.trim(),
         email: email.trim(),
+        fullName: fullName.trim(),
         password: password.trim(),
       })
       toast({ title: 'КШП создано', variant: 'success' })
       setName('')
       setDistrict('')
       setEmail('')
+      setFullName('')
       setPassword('')
+      await loadKitchens()
       onOpenChange(false)
     } catch (error) {
       toast({ title: 'Не удалось создать КШП', description: error.message, variant: 'error' })
@@ -62,6 +70,9 @@ function CreateKitchenDialog({ open, onOpenChange }) {
         </Field>
         <Field label="Район">
           <Input value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="Центральный район" />
+        </Field>
+        <Field label="ФИО сотрудника КШП" className="sm:col-span-2">
+          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Иван Петров" />
         </Field>
         <Field label="Логин общего аккаунта КШП (e-mail)">
           <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="kitchen@school.by" />

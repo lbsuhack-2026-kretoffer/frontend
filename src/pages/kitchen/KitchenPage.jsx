@@ -107,10 +107,11 @@ export default function KitchenPage() {
     const form = new FormData(event.target)
     const name = form.get('name')
     const district = form.get('district')
+    const fullName = form.get('fullName')
     const email = form.get('email')
     const password = form.get('password')
 
-    if (!name || !district || !email || !password) {
+    if (!name || !district || !fullName || !email || !password) {
       toast({ title: 'Заполните все поля', variant: 'error' })
       return
     }
@@ -119,6 +120,7 @@ export default function KitchenPage() {
       await createKitchen.mutateAsync({
         name: String(name),
         district: String(district),
+        fullName: String(fullName),
         email: String(email),
         password: String(password),
       })
@@ -401,6 +403,9 @@ export default function KitchenPage() {
           </Field>
           <Field label="Район">
             <Input name="district" placeholder="Центральный район" />
+          </Field>
+          <Field label="ФИО сотрудника КШП" className="sm:col-span-2">
+            <Input name="fullName" placeholder="Иван Петров" />
           </Field>
           <Field label="Логин общего аккаунта КШП (e-mail)" className="sm:col-span-2">
             <Input type="email" name="email" placeholder="kitchen@school.by" />
