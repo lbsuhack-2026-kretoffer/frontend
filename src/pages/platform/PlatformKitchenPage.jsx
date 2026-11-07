@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Factory, Plus, Utensils, Menu, Link, Unlink } from 'lucide-react'
-import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
+import { Factory, Plus, Utensils, Menu, Link, Unlink, Trash2 } from 'lucide-react'
+import { useCreateKitchen, useCreateKitchenUser, useCreateMenuItem, useDeleteKitchen, useKitchenSchools, useSetSchoolKitchen } from '@/api/hooks'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
-import { Dialog } from '@/shared/ui/dialog'
+import { ConfirmDialog, Dialog } from '@/shared/ui/dialog'
 import { EmptyState } from '@/shared/ui/empty-state'
 import { Field, Input, Select } from '@/shared/ui/input'
 import { PageHeader } from '@/shared/ui/page-header'
@@ -14,7 +14,6 @@ function CreateKitchenDialog({ open, onOpenChange }) {
   const [name, setName] = useState('')
   const [district, setDistrict] = useState('')
   const [email, setEmail] = useState('')
-  const [fullName, setFullName] = useState('')
   const [password, setPassword] = useState('')
   const { toast } = useToast()
   const createKitchen = useCreateKitchen()
@@ -29,19 +28,25 @@ function CreateKitchenDialog({ open, onOpenChange }) {
       toast({ title: 'Укажите район', variant: 'error' })
       return
     }
+    if (!email.trim()) {
+      toast({ title: 'Укажите логин (e-mail) общего аккаунта КШП', variant: 'error' })
+      return
+    }
+    if (!password.trim()) {
+      toast({ title: 'Укажите пароль общего аккаунта КШП', variant: 'error' })
+      return
+    }
     try {
       await createKitchen.mutateAsync({
         name: name.trim(),
         district: district.trim(),
-        email: email.trim() || undefined,
-        fullName: fullName.trim() || undefined,
-        password: password.trim() || undefined,
+        email: email.trim(),
+        password: password.trim(),
       })
       toast({ title: 'КШП создано', variant: 'success' })
       setName('')
       setDistrict('')
       setEmail('')
-      setFullName('')
       setPassword('')
       onOpenChange(false)
     } catch (error) {
@@ -58,13 +63,10 @@ function CreateKitchenDialog({ open, onOpenChange }) {
         <Field label="Район">
           <Input value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="Центральный район" />
         </Field>
-        <Field label="E-mail пользователя КШП (логин)">
+        <Field label="Логин общего аккаунта КШП (e-mail)">
           <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="kitchen@school.by" />
         </Field>
-        <Field label="ФИО пользователя КШП">
-          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Иван Петров" />
-        </Field>
-        <Field label="Пароль пользователя КШП" type="password">
+        <Field label="Пароль общего аккаунта КШП" type="password">
           <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
         </Field>
         <div className="flex justify-end gap-2">
@@ -182,9 +184,12 @@ export default function PlatformKitchenPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [attachOpen, setAttachOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [kitchenToDelete, setKitchenToDelete] = useState(null)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const setSchoolKitchen = useSetSchoolKitchen()
+  const deleteKitchen = useDeleteKitchen()
 
   const loadKitchens = useCallback(async () => {
     setLoading(true)
@@ -228,6 +233,22 @@ export default function PlatformKitchenPage() {
       toast({ title: 'Школа отвязана от КШП', variant: 'success' })
     } catch (error) {
       toast({ title: 'Не удалось отвязать школу', description: error.message, variant: 'error' })
+    }
+  }
+
+  const handleDeleteKitchen = async () => {
+    if (!kitchenToDelete) return
+    try {
+      await deleteKitchen.mutateAsync(kitchenToDelete.id)
+      toast({ title: 'КШП удалено', variant: 'success' })
+      setDeleteOpen(false)
+      setKitchenToDelete(null)
+      await loadKitchens()
+      if (selectedKitchen?.id === kitchenToDelete.id) {
+        setSelectedKitchen(null)
+      }
+    } catch (error) {
+      toast({ title: 'Не удалось удалить КШП', description: error.message, variant: 'error' })
     }
   }
 
@@ -276,17 +297,31 @@ export default function PlatformKitchenPage() {
                 <div className="space-y-2">
                   {kitchens.map((kitchen) => (
                     <div key={kitchen.id} className="flex items-center justify-between p-3 rounded-lg border border-line hover:bg-elevated cursor-pointer transition-colors group" onClick={() => selectKitchen(kitchen)}>
-                      <div>
-                        <div className="font-medium text-strong">{kitchen.name}</div>
-                        <div className="text-[11px] text-muted">{kitchen.district}</div>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <div className="font-medium text-strong">{kitchen.name}</div>
+                          <div className="text-[11px] text-muted">{kitchen.district}</div>
+                        </div>
+                        <Button size="sm" variant="outline" onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedKitchen(kitchen)
+                          loadMenu(kitchen.id)
+                        }}>
+                          <Utensils className="h-3.5 w-3.5 mr-1" />
+                          Меню
+                        </Button>
                       </div>
-                      <Button size="sm" variant="outline" onClick={(e) => {
-                        e.stopPropagation()
-                        setSelectedKitchen(kitchen)
-                        loadMenu(kitchen.id)
-                      }}>
-                        <Utensils className="h-3.5 w-3.5 mr-1" />
-                        Меню
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setKitchenToDelete(kitchen)
+                          setDeleteOpen(true)
+                        }}
+                        aria-label="Удалить КШП"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-red-400" />
                       </Button>
                     </div>
                   ))}
@@ -407,6 +442,19 @@ export default function PlatformKitchenPage() {
         onOpenChange={setAttachOpen}
         kitchenId={selectedKitchen?.id}
         schools={kitchenSchools}
+      />
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={(open) => !open && setDeleteOpen(false)}
+        title="Удалить КШП?"
+        description={
+          kitchenToDelete
+            ? `Комбинат питания «${kitchenToDelete.name}» и все привязанные к нему школы будут удалены.`
+            : ''
+        }
+        confirmLabel="Удалить"
+        loading={deleteKitchen.isPending}
+        onConfirm={handleDeleteKitchen}
       />
     </>
   )
