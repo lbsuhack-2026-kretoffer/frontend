@@ -10,7 +10,7 @@ import { PageHeader } from '@/shared/ui/page-header'
 import { Table, TBody, TD, TH, THead, TR } from '@/shared/ui/table'
 import { useToast } from '@/shared/ui/use-toast'
 
-function CreateKitchenDialog({ open, onOpenChange }) {
+function CreateKitchenDialog({ open, onOpenChange, onKitchenCreated }) {
   const [name, setName] = useState('')
   const [district, setDistrict] = useState('')
   const [email, setEmail] = useState('')
@@ -55,7 +55,7 @@ function CreateKitchenDialog({ open, onOpenChange }) {
       setEmail('')
       setFullName('')
       setPassword('')
-      await loadKitchens()
+      await onKitchenCreated?.()
       onOpenChange(false)
     } catch (error) {
       toast({ title: 'Не удалось создать КШП', description: error.message, variant: 'error' })
@@ -449,7 +449,11 @@ export default function PlatformKitchenPage() {
         </div>
       </div>
 
-      <CreateKitchenDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <CreateKitchenDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onKitchenCreated={loadKitchens}
+      />
       <MenuItemDialog
         open={menuOpen}
         onOpenChange={setMenuOpen}
